@@ -1,0 +1,31 @@
+/** Every React Query key in one place, so hooks and invalidations always agree. */
+export const keys = {
+  me: ["me"] as const,
+  departments: ["departments"] as const,
+  settings: ["settings"] as const,
+  cart: ["cart"] as const,
+  cartFor: (to?: { lat: number; lng: number }) => ["cart", to ? `${to.lat.toFixed(4)},${to.lng.toFixed(4)}` : null] as const,
+  saved: ["saved"] as const,
+  sites: ["sites"] as const,
+  orders: ["orders"] as const,
+  order: (number: string) => ["orders", number] as const,
+  seller: {
+    all: ["seller"] as const,
+    store: ["seller", "store"] as const,
+    banks: ["seller", "banks"] as const,
+    listings: ["seller", "listings"] as const,
+    listing: (slug: string) => ["seller", "listings", slug] as const,
+    orders: ["seller", "orders"] as const,
+    enquiries: ["seller", "enquiries"] as const,
+  },
+  admin: {
+    all: ["admin"] as const,
+    overview: ["admin", "overview"] as const,
+    quotes: ["admin", "quotes"] as const,
+    enquiries: ["admin", "enquiries"] as const,
+    stores: ["admin", "stores"] as const,
+    promos: ["admin", "promos"] as const,
+    settings: ["admin", "settings"] as const,
+    estates: ["admin", "estates"] as const,
+  },
+}
