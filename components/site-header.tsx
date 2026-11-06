@@ -25,7 +25,7 @@ async function CatalogNav({ part }: { part: "menu" | "links" }) {
   return headerCategories.flatMap((slug) => {
     const c = categories.find((x) => x.slug === slug)
     return c ? (
-      <Link key={slug} href={`/search?category=${slug}`} className="py-2 text-muted-foreground hover:text-foreground max-lg:hidden">
+      <Link key={slug} href={`/search?category=${slug}`} className="py-2 text-muted-foreground hover:text-foreground">
         {c.name}
       </Link>
     ) : []
@@ -34,49 +34,67 @@ async function CatalogNav({ part }: { part: "menu" | "links" }) {
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="container-page flex flex-wrap items-center gap-x-3 gap-y-2 py-3 md:gap-x-5">
-        <Logo />
-        <Suspense fallback={<Skeleton className="h-11 w-11 rounded-full sm:w-36" />}>
-          <CatalogNav part="menu" />
-        </Suspense>
-        <div className="order-last w-full md:order-none md:w-auto md:flex-1">
-          <Suspense fallback={<SearchBoxFallback />}>
-            <SearchBox />
+    <>
+      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
+        <div className="container-page flex flex-wrap items-center gap-x-3 gap-y-2 py-3 max-sm:gap-x-2 max-sm:gap-y-1.5 max-sm:py-2 md:gap-x-5">
+          <Logo />
+          <Suspense fallback={<Skeleton className="h-11 w-36 rounded-full max-sm:order-first max-sm:size-9" />}>
+            <CatalogNav part="menu" />
           </Suspense>
+          <div className="order-last w-full md:order-none md:w-auto md:flex-1">
+            <Suspense fallback={<SearchBoxFallback />}>
+              <SearchBox />
+            </Suspense>
+          </div>
+          <div className="hidden lg:block">
+            <LocationPicker />
+          </div>
+          <nav aria-label="Account" className="ml-auto flex gap-2 max-sm:gap-1.5 md:ml-0">
+            <UserMenu />
+            <Button asChild variant="secondary" size="icon" className="max-sm:hidden">
+              <Link href="/saved" aria-label="Saved items">
+                <Heart aria-hidden />
+              </Link>
+            </Button>
+            <CartLink />
+          </nav>
         </div>
-        <div className="hidden lg:block">
-          <LocationPicker />
-        </div>
-        <nav aria-label="Account" className="ml-auto flex gap-2 md:ml-0">
-          <UserMenu />
-          <Button asChild variant="secondary" size="icon" className="hidden sm:inline-flex">
-            <Link href="/saved" aria-label="Saved items">
-              <Heart aria-hidden />
-            </Link>
-          </Button>
-          <CartLink />
+        <nav aria-label="Popular categories" className="container-page hidden items-center gap-6 pb-2 text-sm whitespace-nowrap lg:flex">
+          <Link href="/search?deals=1" className="py-2 font-semibold text-deal-soft-foreground">
+            Deals
+          </Link>
+          <Suspense fallback={<Skeleton className="h-4 w-96" />}>
+            <CatalogNav part="links" />
+          </Suspense>
+          <span className="flex-1" />
+          <Link href="/services" className="py-2 text-muted-foreground hover:text-foreground">
+            Hire a pro
+          </Link>
+          <Link href="/quote" className="py-2 text-muted-foreground hover:text-foreground">
+            Request a quote
+          </Link>
+          <Link href="/real-estate" className="py-2 text-muted-foreground hover:text-foreground">
+            Real estate
+          </Link>
         </nav>
-      </div>
-      <nav aria-label="Popular categories" className="container-page flex items-center gap-6 overflow-x-auto pb-2 text-sm whitespace-nowrap">
-        <div className="lg:hidden">
-          <LocationPicker />
-        </div>
-        <Link href="/search?deals=1" className="py-2 font-semibold text-deal-soft-foreground max-lg:hidden">
+      </header>
+      {/* Phones and tablets: one slim line that scrolls away, so the sticky header stays short. */}
+      <nav aria-label="Delivery location and shortcuts" className="container-page flex h-9 items-center gap-3 border-b text-xs whitespace-nowrap lg:hidden">
+        <LocationPicker compact />
+        <Link href="/search?deals=1" className="font-semibold text-deal-soft-foreground">
           Deals
         </Link>
-        <Suspense fallback={<Skeleton className="h-4 w-96 max-lg:hidden" />}>
-          <CatalogNav part="links" />
-        </Suspense>
-        <span className="flex-1" />
-        <Link href="/quote" className="py-2 text-muted-foreground hover:text-foreground">
-          Request a quote
+        <Link href="/services" className="text-muted-foreground">
+          Hire a pro
         </Link>
-        <Link href="/real-estate" className="py-2 text-muted-foreground hover:text-foreground">
+        <Link href="/quote" className="text-muted-foreground">
+          Quote
+        </Link>
+        <Link href="/real-estate" className="text-muted-foreground">
           Real estate
         </Link>
       </nav>
-    </header>
+    </>
   )
 }
 
@@ -86,8 +104,8 @@ function MenuLinks({ items }: { items: { slug: string; name: string; tone: Tone;
       {items.map((c) => (
         <li key={c.slug}>
           <SheetClose asChild>
-            <Link href={c.href} className="flex min-h-12 items-center gap-3 rounded-2xl p-2 hover:bg-secondary">
-              <span className={cn("grid size-10 place-items-center rounded-xl", tones[c.tone].bg)}>
+            <Link href={c.href} className="flex min-h-12 items-center gap-3 rounded-2xl p-2 hover:bg-secondary max-sm:min-h-10 max-sm:p-1">
+              <span className={cn("grid size-10 place-items-center rounded-xl max-sm:size-8", tones[c.tone].bg)}>
                 <CategoryIcon slug={c.slug} className={cn("size-5", tones[c.tone].fg)} />
               </span>
               {c.name}
@@ -103,9 +121,9 @@ function CategoriesSheet({ departments }: { departments: Department[] }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="secondary">
+        <Button variant="secondary" aria-label="Categories" className="max-sm:order-first max-sm:size-9 max-sm:p-0">
           <Menu aria-hidden />
-          <span className="max-sm:sr-only">Categories</span>
+          <span className="max-sm:hidden">Categories</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="gap-0 overflow-y-auto">
@@ -122,7 +140,13 @@ function CategoriesSheet({ departments }: { departments: Department[] }) {
               <MenuLinks items={d.categories.map((c) => ({ ...c, href: `/search?category=${c.slug}` }))} />
             </section>
           ))}
-          <MenuLinks items={[{ slug: "real-estate", name: "Real estate", tone: "lilac", href: "/real-estate" }]} />
+          <MenuLinks
+            items={[
+              { slug: "builders", name: "Hire a pro", tone: "yellow", href: "/services" },
+              { slug: "real-estate", name: "Real estate", tone: "lilac", href: "/real-estate" },
+              { slug: "quote", name: "Request a quote", tone: "mint", href: "/quote" },
+            ]}
+          />
         </nav>
       </SheetContent>
     </Sheet>

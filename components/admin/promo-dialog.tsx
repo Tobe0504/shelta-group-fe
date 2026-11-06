@@ -60,7 +60,7 @@ export function PromoDialog({ promo, children }: { promo?: AdminPromo; children:
               <DialogTitle>{promo ? "Edit promo" : "New promo"}</DialogTitle>
             </DialogHeader>
             <PromoCarousel promos={[{ ...p, id: "preview", title: p.title || "Your headline", badge: p.badge || "Badge", text: p.text || "Supporting line", cta: p.cta || "Button" }]} size="banner" label="Preview" />
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
               {textFields.map((f) => (
                 <Field key={f.key} data-invalid={!!errors[f.key]}>
                   <FieldLabel htmlFor={`promo-${f.key}`}>{f.label}</FieldLabel>

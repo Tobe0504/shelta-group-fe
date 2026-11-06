@@ -18,7 +18,7 @@ export function StatusFilter<T extends string | number>({
   onChange: (value: T) => void
 }) {
   return (
-    <div role="group" aria-label={label} className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:auto-cols-fr lg:grid-flow-col lg:grid-cols-none">
+    <div role="group" aria-label={label} className="grid grid-cols-3 gap-3 max-sm:gap-1.5 lg:auto-cols-fr lg:grid-flow-col lg:grid-cols-none">
       {options.map(({ value: v, label: l, count, icon: Icon, tone }) => {
         const active = v === value
         return (
@@ -28,16 +28,16 @@ export function StatusFilter<T extends string | number>({
             aria-pressed={active}
             onClick={() => onChange(v)}
             className={cn(
-              "flex flex-col items-start gap-3 rounded-2xl border-2 border-transparent bg-muted p-4 text-left transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+              "flex flex-col items-start gap-3 rounded-2xl border-2 border-transparent bg-muted p-4 text-left max-sm:gap-1 max-sm:rounded-xl max-sm:p-2 transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
               active && "border-primary bg-accent hover:bg-accent",
             )}
           >
-            <span className={cn("grid size-9 place-items-center rounded-xl", tones[tone].bg)}>
+            <span className={cn("grid size-9 place-items-center rounded-xl max-sm:hidden", tones[tone].bg)}>
               <Icon aria-hidden className={cn("size-4.5", tones[tone].fg)} />
             </span>
             <span className="flex flex-col">
-              <span className="text-2xl leading-none font-semibold tabular-nums">{count}</span>
-              <span className={cn("text-sm text-muted-foreground", active && "text-accent-foreground")}>{l}</span>
+              <span className="text-2xl leading-none font-semibold tabular-nums max-sm:text-base">{count}</span>
+              <span className={cn("text-sm text-muted-foreground max-sm:text-xs", active && "text-accent-foreground")}>{l}</span>
             </span>
           </button>
         )

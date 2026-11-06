@@ -5,7 +5,9 @@ export type Tone = "blue" | "peach" | "mint" | "lilac" | "yellow" | "pink" | "te
 export type Paged<T> = { data: T[]; meta: { page: number; limit: number; total: number; pages: number } }
 
 export type Category = { id: string; slug: string; name: string; tone: Tone; department: string }
-export type Department = { id: string; slug: string; name: string; categories: Category[] }
+/** `products` are sold through the cart; `services` are trades people hire through job requests. */
+export type DepartmentKind = "products" | "services"
+export type Department = { id: string; slug: string; name: string; kind?: DepartmentKind; categories: Category[] }
 export type Coords = { lat: number; lng: number }
 /** A searched or pinned location. */
 export type Place = { label: string; area: string; state?: string; coords: Coords }
@@ -136,6 +138,10 @@ export type Estate = {
   images?: string[]
   developer?: string
   active?: boolean
+  address?: string
+  coords?: Coords
+  /** Full write-up for the property page. */
+  description?: string
 }
 export type EstateList = Paged<Estate> & { facets: { kinds: Partial<Record<EstateKind, number>>; cities: string[] } }
 
@@ -153,6 +159,94 @@ export type Promo = {
   sponsor?: string
 }
 
+// ——— Services ———
+
+export type ProKind = "individual" | "company"
+export type RateUnit = "job" | "day" | "hour" | "m²"
+/** A tradesperson or firm buyers can hire. */
+export type Pro = {
+  id: string
+  slug: string
+  name: string
+  kind: ProKind
+  headline: string
+  trades: string[]
+  about?: string
+  location: string
+  coords?: Coords
+  radiusKm: number
+  rate?: { amount: number; unit: RateUnit }
+  years?: number
+  photo?: string
+  portfolio: string[]
+  verified: boolean
+  rating: number
+  reviewCount: number
+  jobsDone: number
+  /** Only on location searches. */
+  distanceKm?: number
+}
+export type ProReview = { id: string; name: string; rating: number; text?: string; createdAt: string }
+export type ProProfile = Pro & { reviews: ProReview[] }
+/** The signed-in user's own profile, including their private phone and payout account. */
+export type OwnPro = Pro & { phone: string; active: boolean; payout?: Payout }
+export type ProInput = Omit<Pro, "id" | "slug" | "verified" | "rating" | "reviewCount" | "jobsDone" | "distanceKm" | "rate"> & { phone: string; rate?: Pro["rate"] | null; photo?: string | null }
+
+export type JobStatus = "open" | "hired" | "completed" | "cancelled"
+export type BidStatus = "sent" | "accepted" | "declined"
+/** A quoting pro as the buyer sees them; `phone` only once hired. */
+export type BidPro = Pick<Pro, "id" | "slug" | "name" | "headline" | "photo" | "rating" | "reviewCount" | "jobsDone" | "verified"> & { phone?: string }
+export type StageDraft = { title: string; amount: number }
+export type Bid = { id: string; pro: BidPro; amount: number; timeline: string; message?: string; stages: StageDraft[]; status: BidStatus; createdAt: string }
+/** unpaid → pending (at checkout) → held in escrow → released to the pro, or refunded. */
+export type StageStatus = "unpaid" | "pending" | "held" | "released" | "refunded"
+export type PayoutStatus = "not_due" | "pending" | "paid" | "failed"
+export type Stage = StageDraft & {
+  id: string
+  status: StageStatus
+  paidAt?: string
+  releasedAt?: string
+  commission?: number
+  payout?: number
+  payoutStatus: PayoutStatus
+  issue?: { message: string; at: string }
+}
+export type Job = {
+  id: string
+  trade: string
+  title: string
+  description: string
+  site: { address: string; area?: string; coords?: Coords }
+  photos: string[]
+  budget?: number
+  startBy?: string
+  contactName: string
+  contactPhone: string
+  pro?: { slug: string; name: string }
+  status: JobStatus
+  bids: Bid[]
+  stages: Stage[]
+  reviewed: boolean
+  createdAt: string
+}
+export type JobInput = Pick<Job, "trade" | "title" | "description" | "site" | "photos" | "budget" | "startBy" | "contactName" | "contactPhone"> & { pro?: string }
+/** An open job as a pro sees it before being hired. */
+export type Lead = Pick<Job, "id" | "trade" | "title" | "description" | "photos" | "budget" | "startBy" | "status" | "createdAt"> & { area?: string; quotes: number; direct: boolean; distanceKm: number | null }
+/** A job the pro quoted on; contact details only when they won it. */
+export type ProJob = Omit<Lead, "direct" | "distanceKm"> & {
+  bid: Omit<Bid, "pro">
+  won: boolean
+  stages: Pick<Stage, "id" | "title" | "amount" | "status" | "paidAt" | "payout" | "payoutStatus">[]
+  contactName?: string
+  contactPhone?: string
+  address?: string
+}
+/** One job on the pro's detail page: a lead they can still quote on, or a job they quoted on. */
+export type ProJobDetail = (Lead & { quoted: false }) | (ProJob & { quoted: true })
+export type BidInput = { amount: number; timeline: string; message?: string; stages?: StageDraft[] }
+/** A job with money in escrow or a payout outstanding, for admins. */
+export type EscrowJob = Omit<Job, "bids" | "pro"> & { user: { id: string; name: string; email: string }; hired: { id: string; slug: string; name: string; phone: string } }
+
 export type Enquiry = { id: string; topic: "product" | "estate"; name: string; phone: string; reason?: string; message: string; status: "new" | "replied" | "closed"; product?: { slug: string; name: string }; createdAt: string }
 
 // ——— Admin ———
@@ -169,6 +263,8 @@ export type AdminOverview = {
   newQuotes: number
   newEnquiries: number
   unverifiedStores: number
+  unverifiedPros: number
+  escrow: { amount: number; count: number; issues: number }
   buyers: number
   liveProducts: number
 }
@@ -180,10 +276,14 @@ export type MarketplaceSettings = {
   deliveryWindows: string[]
   deliveryDaysAhead: number
   payoutDelayHours: number
+  jobQuoteLimit: number
+  serviceCommissionRate: number
 } & DeliveryRates
 export type PromoInput = Omit<Promo, "id"> & { order?: number; active?: boolean }
-export type EstateInput = Omit<Estate, "id" | "slug">
+export type EstateInput = Omit<Estate, "id" | "slug" | "coords"> & { coords?: Coords | null }
 export type CategoryInput = Omit<Category, "id"> & { order?: number }
-export type DepartmentInput = { slug: string; name: string; order?: number }
+export type DepartmentInput = { slug: string; name: string; kind?: DepartmentKind; order?: number }
+
+export type AdminPro = OwnPro & { owner: { id: string; name: string; email: string }; createdAt: string }
 
 export type AdminPromo = Promo & { order: number; active: boolean }

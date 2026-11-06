@@ -38,6 +38,7 @@ export function useUpdateListing() {
   const client = useQueryClient()
   return useMutation({
     mutationFn: ({ slug, body }: { slug: string; body: Partial<ProductInput> }) => sellerService.updateProduct(slug, body),
+    meta: { pending: "Updating product…" },
     onSuccess: (listing: Listing) => {
       client.setQueryData(keys.seller.listing(listing.slug), listing)
       client.invalidateQueries({ queryKey: keys.seller.listings, exact: true })
@@ -47,7 +48,7 @@ export function useUpdateListing() {
 
 export function useDeleteListing() {
   const client = useQueryClient()
-  return useMutation({ mutationFn: sellerService.deleteProduct, onSuccess: () => client.invalidateQueries({ queryKey: keys.seller.listings, exact: true }) })
+  return useMutation({ mutationFn: sellerService.deleteProduct, meta: { pending: "Deleting product…" }, onSuccess: () => client.invalidateQueries({ queryKey: keys.seller.listings, exact: true }) })
 }
 
 type Step = { type: "accept" } | { type: "load" } | { type: "dispatch"; driver: Driver } | { type: "decline"; reason: string }
@@ -56,6 +57,7 @@ type Step = { type: "accept" } | { type: "load" } | { type: "dispatch"; driver: 
 export function useShipmentStep() {
   const client = useQueryClient()
   return useMutation({
+    meta: { pending: "Updating order…" },
     mutationFn: ({ number, id, step }: { number: string; id: string; step: Step }) =>
       step.type === "dispatch"
         ? sellerService.dispatch(number, id, step.driver)
@@ -70,6 +72,7 @@ export function useSetEnquiryStatus() {
   const client = useQueryClient()
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: Enquiry["status"] }) => sellerService.setEnquiryStatus(id, status),
+    meta: { pending: "Updating message…" },
     onSuccess: () => client.invalidateQueries({ queryKey: keys.seller.enquiries }),
   })
 }

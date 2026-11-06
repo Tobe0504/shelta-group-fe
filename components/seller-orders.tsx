@@ -57,7 +57,7 @@ function DispatchDialog({ pending, onDispatch }: { pending: boolean; onDispatch:
               <FieldLabel htmlFor="driver">Driver name</FieldLabel>
               <Input id="driver" name="driver" required />
             </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
               <Field>
                 <FieldLabel htmlFor="truck">Truck plate</FieldLabel>
                 <Input id="truck" name="truck" required placeholder="LND 482 XA" />
@@ -97,16 +97,16 @@ export function SellerOrders() {
       ) : isError ? (
         <EmptyState>We couldn’t load your orders. Refresh to try again.</EmptyState>
       ) : (
-        <ul aria-busy={step.isPending} className="flex flex-col gap-4">
+        <ul aria-busy={step.isPending} className="flex flex-col gap-4 max-sm:gap-2">
           {shown.map(({ order, shipment }) => {
             const move = (s: Parameters<typeof step.mutate>[0]["step"], message: string, done?: () => void) =>
               step.mutate({ number: order.number, id: shipment.id, step: s }, { onSuccess: () => (toast.success(message), done?.()) })
             return (
               <li key={shipment.id}>
-                <Card className="gap-5 px-5 py-5 sm:px-6">
+                <Card className="gap-5 px-5 py-5 max-sm:gap-3 max-sm:p-3 sm:px-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex flex-col gap-1">
-                      <h2 className="text-lg">Order {order.number}</h2>
+                      <h2 className="text-lg max-sm:text-base">Order {order.number}</h2>
                       <p className="text-sm text-muted-foreground">
                         {shipment.lines.map((l) => `${l.name.split(",")[0]} × ${l.qty}`).join(" · ")}
                         {shipment.offload && " · offloading crew"}
@@ -116,7 +116,7 @@ export function SellerOrders() {
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <span className="text-lg font-semibold tabular-nums">{formatNaira(shipment.payout)}</span>
+                      <span className="text-lg font-semibold tabular-nums max-sm:text-base">{formatNaira(shipment.payout)}</span>
                       <Badge variant={shipment.status === "delivered" ? "success" : shipment.status === "cancelled" ? "secondary" : "deal-soft"}>{statusLabel(shipment)}</Badge>
                     </div>
                   </div>
@@ -155,7 +155,7 @@ export function SellerOrders() {
               </li>
             )
           })}
-          {!shown.length && <li className="rounded-3xl bg-muted p-12 text-center text-muted-foreground">Nothing here.</li>}
+          {!shown.length && <li className="rounded-3xl bg-muted p-12 text-center text-muted-foreground max-sm:rounded-2xl max-sm:p-6 max-sm:text-sm">Nothing here.</li>}
         </ul>
       )}
     </>

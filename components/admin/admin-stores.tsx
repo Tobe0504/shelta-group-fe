@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsCount, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAdminStores, useVerifyStore } from "@/hooks/use-admin"
 import { formatDay } from "@/lib/format"
 import type { AdminStore } from "@/lib/types"
@@ -53,7 +53,8 @@ export function AdminStores() {
           <TabsList>
             {tabs.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>
-                {t.label} ({stores.filter(t.match).length})
+                {t.label}
+                <TabsCount>{stores.filter(t.match).length}</TabsCount>
               </TabsTrigger>
             ))}
           </TabsList>

@@ -62,7 +62,7 @@ export function ImageUploader({ name, kind, initial = [], max = 6, label }: { na
         )}
       </ul>
       <input ref={file} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" tabIndex={-1} aria-hidden onChange={(e) => add(e.target.files)} />
-      <p className="text-sm text-muted-foreground">Up to {max} photos. The first is the cover.</p>
+      <p className="text-sm text-muted-foreground max-sm:text-xs">{max === 1 ? "One photo, square works best." : `Up to ${max} photos. The first is the cover.`}</p>
     </fieldset>
   )
 }

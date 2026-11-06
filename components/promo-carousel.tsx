@@ -20,8 +20,8 @@ const themes: Record<Promo["theme"], string> = {
 }
 
 const sizes = {
-  hero: { slide: "min-h-72 p-8 lg:p-10", title: "text-3xl sm:text-4xl max-w-md", icon: "size-40 sm:size-52" },
-  banner: { slide: "min-h-40 p-6 sm:px-8", title: "text-xl sm:text-2xl max-w-sm", icon: "size-28 sm:size-32" },
+  hero: { slide: "min-h-72 p-8 lg:p-10 max-sm:min-h-36 max-sm:p-4", title: "text-3xl sm:text-4xl max-w-md max-sm:text-lg", icon: "size-24 sm:size-52" },
+  banner: { slide: "min-h-40 p-6 sm:px-8 max-sm:min-h-28 max-sm:p-3.5", title: "text-xl sm:text-2xl max-w-sm max-sm:text-base", icon: "size-20 sm:size-32" },
 }
 
 /** Auto-advancing ad carousel. Pauses on hover/focus, never autoplays with reduced motion, and has a pause button. */
@@ -55,15 +55,15 @@ export function PromoCarousel({ promos, size = "hero", label = "Offers", classNa
           const Icon = icons[p.icon]
           return (
             <CarouselItem key={p.id} aria-label={`${i + 1} of ${promos.length}`}>
-              <div className={cn("relative flex h-full flex-col justify-center gap-3 overflow-hidden rounded-[28px] max-sm:pb-20", themes[p.theme], s.slide)}>
+              <div className={cn("relative flex h-full flex-col justify-center gap-3 overflow-hidden rounded-[28px] max-sm:gap-1.5 max-sm:rounded-2xl", themes[p.theme], s.slide)}>
                 <Icon aria-hidden strokeWidth={1} className={cn("pointer-events-none absolute -right-4 -bottom-6 opacity-15", s.icon)} />
                 <span className="flex flex-wrap items-center gap-2">
-                  <Badge variant={p.theme === "deal" ? "secondary" : "deal"} className="h-7 px-3 text-sm">{p.badge}</Badge>
-                  {p.sponsor && <span className="text-sm opacity-80">Ad · {p.sponsor}</span>}
+                  <Badge variant={p.theme === "deal" ? "secondary" : "deal"} className="h-7 px-3 text-sm max-sm:h-5 max-sm:px-2 max-sm:text-xs">{p.badge}</Badge>
+                  {p.sponsor && <span className="text-sm opacity-80 max-sm:text-xs">Ad · {p.sponsor}</span>}
                 </span>
                 <h2 className={cn("relative leading-tight font-semibold tracking-tight text-balance", s.title)}>{p.title}</h2>
-                <p className="relative opacity-85">{p.text}</p>
-                <Button asChild variant="outline" size={size === "hero" ? "lg" : "default"} className="relative mt-1 w-fit border-0 bg-background text-foreground hover:bg-background/90">
+                <p className="relative opacity-85 max-sm:line-clamp-1 max-sm:text-xs">{p.text}</p>
+                <Button asChild variant="outline" size={size === "hero" ? "lg" : "default"} className="relative mt-1 w-fit border-0 bg-background text-foreground hover:bg-background/90 max-sm:h-8 max-sm:px-3 max-sm:text-sm">
                   <Link href={p.href} tabIndex={i === current ? undefined : -1}>{p.cta}</Link>
                 </Button>
               </div>
@@ -72,9 +72,9 @@ export function PromoCarousel({ promos, size = "hero", label = "Offers", classNa
         })}
       </CarouselContent>
       {multiple && (
-        <div className="absolute right-4 bottom-4 flex items-center gap-1 rounded-full bg-background/90 p-1 shadow-sm backdrop-blur sm:right-6 sm:bottom-6">
-          <CarouselPrevious variant="ghost" className="static size-8 translate-none" />
-          <div className="flex items-center gap-1.5 px-1">
+        <div className="absolute right-4 bottom-4 flex items-center gap-1 rounded-full bg-background/90 p-1 text-foreground shadow-sm backdrop-blur max-sm:right-2.5 max-sm:bottom-2.5 max-sm:gap-0 max-sm:p-0.5 sm:right-6 sm:bottom-6">
+          <CarouselPrevious variant="ghost" className="static size-8 translate-none max-sm:hidden" />
+          <div className="flex items-center gap-1.5 px-1 max-sm:gap-1">
             {promos.map((p, i) => (
               <button
                 key={p.id}
@@ -82,12 +82,12 @@ export function PromoCarousel({ promos, size = "hero", label = "Offers", classNa
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === current}
                 onClick={() => api?.scrollTo(i)}
-                className={cn("h-2 rounded-full bg-foreground/25 transition-all focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none", i === current ? "w-5 bg-foreground" : "w-2 hover:bg-foreground/50")}
+                className={cn("h-2 rounded-full bg-foreground/25 transition-all focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none", i === current ? "w-5 bg-foreground max-sm:w-3" : "w-2 hover:bg-foreground/50 max-sm:w-1.5", "max-sm:h-1.5")}
               />
             ))}
           </div>
-          <CarouselNext variant="ghost" className="static size-8 translate-none" />
-          <Button variant="ghost" size="icon-sm" className="size-8" aria-label={playing ? "Pause slides" : "Play slides"} onClick={() => setPlaying((v) => !v)}>
+          <CarouselNext variant="ghost" className="static size-8 translate-none max-sm:hidden" />
+          <Button variant="ghost" size="icon-sm" className="size-8 max-sm:size-6 [&_svg]:max-sm:size-3" aria-label={playing ? "Pause slides" : "Play slides"} onClick={() => setPlaying((v) => !v)}>
             {playing ? <Pause /> : <Play />}
           </Button>
         </div>

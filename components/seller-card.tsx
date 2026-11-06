@@ -23,16 +23,16 @@ export function SellerCard({
 }) {
   return (
     <div className={cn("flex flex-wrap items-center gap-3", className)}>
-      <span aria-hidden className="grid size-11 place-items-center rounded-xl bg-[#FFE8D6] font-semibold text-[#9A3412]">
+      <span aria-hidden className="grid size-11 place-items-center rounded-xl max-sm:size-8 max-sm:rounded-lg max-sm:text-xs bg-[#FFE8D6] font-semibold text-[#9A3412]">
         {initials(seller.name)}
       </span>
-      <span className="flex min-w-40 flex-1 flex-col">
+      <span className="flex min-w-40 flex-1 flex-col max-sm:min-w-0 max-sm:text-sm">
         <span className="flex items-center gap-1.5 font-medium">
           {seller.name}
           {seller.verified && <VerifiedBadge />}
         </span>
         {showMeta && (
-          <span className="text-sm text-muted-foreground">{[seller.location, seller.replyTime && `replies in ${seller.replyTime}`].filter(Boolean).join(" · ")}</span>
+          <span className="text-sm text-muted-foreground max-sm:text-xs">{[seller.location, seller.replyTime && `replies in ${seller.replyTime}`].filter(Boolean).join(" · ")}</span>
         )}
       </span>
       {children}

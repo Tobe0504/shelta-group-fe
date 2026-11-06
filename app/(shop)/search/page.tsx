@@ -40,15 +40,17 @@ async function Results({ searchParams }: Pick<PageProps<"/search">, "searchParam
 
   return (
     <>
-      <PageBreadcrumb items={[{ label: "Home", href: "/" }, { label: title }]} />
-      <h1 className="text-3xl font-semibold tracking-tight">
-        {title} <span className="text-base font-normal text-muted-foreground">{results.meta.total} results</span>
+      <div className="max-sm:hidden">
+        <PageBreadcrumb items={[{ label: "Home", href: "/" }, { label: title }]} />
+      </div>
+      <h1 className="text-3xl font-semibold tracking-tight max-sm:text-lg">
+        {title} <span className="text-base font-normal text-muted-foreground max-sm:text-xs">{results.meta.total} results</span>
       </h1>
-      <div className="flex flex-col gap-10 lg:flex-row">
+      <div className="flex flex-col gap-10 max-sm:gap-2.5 lg:flex-row">
         <aside className="lg:w-60 lg:shrink-0">
           <SearchFilters filters={filters} departments={departments} brands={brands} />
         </aside>
-        <div className="flex min-w-0 flex-1 flex-col gap-6">
+        <div className="flex min-w-0 flex-1 flex-col gap-6 max-sm:gap-3">
           <PromoCarousel promos={promos} size="banner" label="Sponsored offers" />
           <ProductGrid products={results.data} empty="No products match these filters. Try removing one." />
         </div>
@@ -59,7 +61,7 @@ async function Results({ searchParams }: Pick<PageProps<"/search">, "searchParam
 
 export default function SearchPage({ searchParams }: PageProps<"/search">) {
   return (
-    <div className="container-page flex flex-col gap-6 py-6">
+    <div className="container-page flex flex-col gap-6 py-6 max-sm:gap-2 max-sm:py-2.5">
       <Suspense fallback={<ResultsSkeleton />}>
         <Results searchParams={searchParams} />
       </Suspense>

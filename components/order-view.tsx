@@ -86,10 +86,10 @@ function ShipmentCard({ order, shipment, index, act }: { order: Order; shipment:
   const { status, driver } = shipment
 
   return (
-    <Card className="gap-5 px-5 py-5 sm:px-6">
+    <Card className="gap-5 px-5 py-5 max-sm:gap-3 max-sm:p-3 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg">
+          <h2 className="text-lg max-sm:text-base">
             {label} · {shipment.storeName}
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -177,10 +177,10 @@ function PaymentBanner({ order }: { order: Order }) {
 
   if (order.payment.status !== "paid")
     return (
-      <div role="status" className="flex flex-wrap items-center gap-4 rounded-3xl bg-deal-soft p-5 text-deal-soft-foreground">
+      <div role="status" className="flex flex-wrap items-center gap-4 rounded-3xl bg-deal-soft p-5 text-deal-soft-foreground max-sm:gap-2 max-sm:rounded-2xl max-sm:p-3 max-sm:text-sm">
         <Clock aria-hidden className="size-8 shrink-0" />
         <span className="flex flex-1 flex-col">
-          <strong className="text-lg font-semibold">Waiting for payment · {formatNaira(order.total)}</strong>
+          <strong className="text-lg font-semibold max-sm:text-sm">Waiting for payment · {formatNaira(order.total)}</strong>
           Sellers start preparing your order once payment is confirmed.
         </span>
         <Button onClick={() => retry.mutate(order.number)} loading={retry.isPending || retry.isSuccess}>
@@ -190,10 +190,10 @@ function PaymentBanner({ order }: { order: Order }) {
     )
 
   return (
-    <p role="status" className="flex flex-wrap items-center gap-4 rounded-3xl bg-success-soft p-5 text-success-soft-foreground">
+    <p role="status" className="flex flex-wrap items-center gap-4 rounded-3xl bg-success-soft p-5 text-success-soft-foreground max-sm:gap-2 max-sm:rounded-2xl max-sm:p-3 max-sm:text-sm">
       <CircleCheck aria-hidden className="size-8 shrink-0 text-success" />
       <span className="flex flex-col">
-        <strong className="text-lg font-semibold">Payment received · {formatNaira(order.total)}</strong>
+        <strong className="text-lg font-semibold max-sm:text-sm">Payment received · {formatNaira(order.total)}</strong>
         {released ? `${formatNaira(released)} released so far. The rest is held until you confirm.` : "It is held safely until you confirm each delivery."}
       </span>
     </p>
@@ -213,7 +213,7 @@ function OrderDetails({ number }: { number: string }) {
       <PaymentBanner order={order} />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl">Order {order.number}</h1>
+          <h1 className="text-3xl max-sm:text-xl">Order {order.number}</h1>
           <p className="text-muted-foreground">
             Placed {formatDay(order.createdAt)} · {order.shipments.length} deliveries to {order.site.address}
           </p>
@@ -223,15 +223,15 @@ function OrderDetails({ number }: { number: string }) {
         </Button>
       </div>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[1fr_340px]">
+      <div className="grid items-start gap-8 max-sm:gap-3 lg:grid-cols-[1fr_340px]">
         <div aria-busy={act.isPending} className="flex flex-col gap-5">
           {order.shipments.map((s, i) => (
             <ShipmentCard key={s.id} order={order} shipment={s} index={i} act={act} />
           ))}
         </div>
 
-        <aside aria-labelledby="payment-heading" className="flex flex-col gap-4 rounded-[28px] bg-muted p-6 lg:sticky lg:top-32">
-          <h2 id="payment-heading" className="text-xl">
+        <aside aria-labelledby="payment-heading" className="flex flex-col gap-4 rounded-[28px] bg-muted p-6 max-sm:gap-2.5 max-sm:rounded-2xl max-sm:p-3.5 lg:sticky lg:top-32">
+          <h2 id="payment-heading" className="text-xl max-sm:text-base">
             Your payment
           </h2>
           <ul className="flex flex-col gap-3">

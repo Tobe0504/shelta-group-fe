@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Heart, LayoutDashboard, LogOut, Package, Store, UserRound } from "lucide-react"
+import { ClipboardList, HardHat, Heart, LayoutDashboard, LogOut, Package, Store, UserRound } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,14 +23,14 @@ const itemClass = "min-h-10 rounded-lg"
 export function UserMenu() {
   const { data: user, isPending } = useMe()
   const signOut = useSignOut()
-  if (isPending) return <Skeleton className="size-11 rounded-full" />
+  if (isPending) return <Skeleton className="size-11 rounded-full max-sm:size-9" />
 
   if (!user)
     return (
-      <Button asChild variant="secondary">
-        <Link href="/login">
+      <Button asChild variant="secondary" className="max-sm:size-9 max-sm:p-0">
+        <Link href="/login" aria-label="Sign in">
           <UserRound aria-hidden />
-          <span className="max-sm:sr-only">Sign in</span>
+          <span className="max-sm:hidden">Sign in</span>
         </Link>
       </Button>
     )
@@ -40,7 +40,7 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" aria-label={`Account menu for ${user.name}`} className="p-0">
-          <UserAvatar user={user} className="size-11" />
+          <UserAvatar user={user} className="size-11 max-sm:size-9" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 p-2">
@@ -67,6 +67,11 @@ export function UserMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className={itemClass}>
+            <Link href="/account/jobs">
+              <ClipboardList aria-hidden /> My jobs
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className={itemClass}>
             <Link href="/saved">
               <Heart aria-hidden /> Saved items
             </Link>
@@ -77,6 +82,11 @@ export function UserMenu() {
           <Link href={user.role === "admin" ? "/admin" : seller ? "/seller" : "/sell"}>
             {seller ? <LayoutDashboard aria-hidden /> : <Store aria-hidden />}
             {user.role === "admin" ? "Admin console" : seller ? "Seller dashboard" : "Start selling"}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className={itemClass}>
+          <Link href="/pro">
+            <HardHat aria-hidden /> Pro centre
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem className={itemClass} onSelect={() => signOut.mutate()}>

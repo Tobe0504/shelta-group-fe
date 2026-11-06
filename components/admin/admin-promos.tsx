@@ -30,7 +30,7 @@ import { PromoDialog } from "./promo-dialog"
 function PromoRow({ promo, categoryName, onDelete }: { promo: AdminPromo; categoryName?: string; onDelete: () => void }) {
   const toggle = useTogglePromo()
   return (
-    <Card className="gap-4 p-4 sm:flex-row sm:items-center">
+    <Card className="gap-4 p-4 max-sm:gap-2.5 max-sm:p-3 sm:flex-row sm:items-center">
       <div className="pointer-events-none sm:w-80 sm:shrink-0" inert>
         <PromoCarousel promos={[promo]} size="banner" label={promo.title} />
       </div>

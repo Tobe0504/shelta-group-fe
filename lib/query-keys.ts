@@ -1,7 +1,9 @@
 /** Every React Query key in one place, so hooks and invalidations always agree. */
 export const keys = {
   me: ["me"] as const,
-  departments: ["departments"] as const,
+  /** Prefix of every catalogue list, for invalidation. */
+  catalog: ["departments"] as const,
+  departments: (kind: string = "products") => ["departments", kind] as const,
   settings: ["settings"] as const,
   cart: ["cart"] as const,
   cartFor: (to?: { lat: number; lng: number }) => ["cart", to ? `${to.lat.toFixed(4)},${to.lng.toFixed(4)}` : null] as const,
@@ -18,14 +20,27 @@ export const keys = {
     orders: ["seller", "orders"] as const,
     enquiries: ["seller", "enquiries"] as const,
   },
+  jobs: ["jobs"] as const,
+  job: (id: string) => ["jobs", id] as const,
+  pro: {
+    all: ["pro"] as const,
+    profile: ["pro", "profile"] as const,
+    leads: ["pro", "leads"] as const,
+    jobs: ["pro", "jobs"] as const,
+    job: (id: string) => ["pro", "jobs", id] as const,
+    banks: ["pro", "banks"] as const,
+  },
   admin: {
     all: ["admin"] as const,
     overview: ["admin", "overview"] as const,
     quotes: ["admin", "quotes"] as const,
+    quote: (id: string) => ["admin", "quotes", id] as const,
     enquiries: ["admin", "enquiries"] as const,
     stores: ["admin", "stores"] as const,
     promos: ["admin", "promos"] as const,
     settings: ["admin", "settings"] as const,
     estates: ["admin", "estates"] as const,
+    pros: ["admin", "pros"] as const,
+    escrow: ["admin", "escrow"] as const,
   },
 }

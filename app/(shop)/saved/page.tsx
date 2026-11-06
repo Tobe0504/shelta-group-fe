@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Saved items" }
 
 export default function SavedPage() {
   return (
-    <div className="container-page flex flex-col gap-8 py-8">
+    <div className="container-page flex flex-col gap-8 py-8 max-sm:gap-3 max-sm:py-3">
       <PageHeader title="Saved items" description="Products you’ve kept for later." />
       <SavedView />
     </div>

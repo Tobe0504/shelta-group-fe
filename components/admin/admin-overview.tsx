@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Banknote, ChevronRight, FileText, MessagesSquare, Package, ShoppingBag, Store, Users, Wallet } from "lucide-react"
+import { Banknote, ChevronRight, FileText, HardHat, MessagesSquare, Package, ShieldAlert, ShoppingBag, Store, Users, Wallet } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -21,7 +21,7 @@ export function AdminOverview() {
     return (
       <>
         <PageHeader title="Admin console" description="Marketplace health and what needs attention." />
-        <div aria-hidden className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div aria-hidden className="grid grid-cols-2 gap-4 max-sm:gap-2 xl:grid-cols-4">
           {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
             <Skeleton key={i} className="h-32 rounded-3xl" />
           ))}
@@ -34,6 +34,8 @@ export function AdminOverview() {
     { href: "/admin/quotes", icon: FileText, tone: "peach", count: o.newQuotes, label: "new quote requests" },
     { href: "/admin/enquiries", icon: MessagesSquare, tone: "lilac", count: o.newEnquiries, label: "new property enquiries" },
     { href: "/admin/stores", icon: Store, tone: "blue", count: o.unverifiedStores, label: "stores waiting for verification" },
+    { href: "/admin/pros", icon: HardHat, tone: "mint", count: o.unverifiedPros, label: "pros waiting for verification" },
+    { href: "/admin/escrow", icon: ShieldAlert, tone: "pink", count: o.escrow.issues, label: `problems reported · ${formatNaira(o.escrow.amount)} in escrow` },
   ] as const
 
   return (
@@ -49,7 +51,7 @@ export function AdminOverview() {
         </Button>
       </PageHeader>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 max-sm:gap-2 xl:grid-cols-4">
         <StatCard icon={Wallet} tone="blue" label="Sales (paid orders)" value={formatNaira(o.gmv)} note={`${o.orders} orders`} />
         <StatCard icon={Banknote} tone="mint" label="Commission earned" value={formatNaira(o.commission)} />
         <StatCard icon={ShoppingBag} tone="peach" label="Payouts pending" value={formatNaira(o.pendingPayouts.amount)} note={`${o.pendingPayouts.count} deliveries`} />
@@ -60,15 +62,15 @@ export function AdminOverview() {
         <h2 id="queues" className="text-lg">
           Needs attention
         </h2>
-        <ul className="grid gap-3 md:grid-cols-3">
+        <ul className="grid gap-3 max-sm:gap-2 md:grid-cols-2 xl:grid-cols-3">
           {queues.map(({ href, icon: Icon, tone, count, label }) => (
             <li key={href}>
-              <Link href={href} className="flex items-center gap-4 rounded-3xl p-5 ring-1 ring-border transition-colors hover:bg-muted">
-                <span className={cn("grid size-11 shrink-0 place-items-center rounded-2xl", tones[tone].bg)}>
+              <Link href={href} className="flex items-center gap-4 rounded-3xl p-5 max-sm:gap-2.5 max-sm:rounded-2xl max-sm:p-3 ring-1 ring-border transition-colors hover:bg-muted">
+                <span className={cn("grid size-11 shrink-0 place-items-center rounded-2xl max-sm:size-9 max-sm:rounded-xl", tones[tone].bg)}>
                   <Icon aria-hidden className={cn("size-5", tones[tone].fg)} />
                 </span>
                 <span className="flex flex-1 flex-col">
-                  <span className="text-2xl font-semibold tabular-nums">{count}</span>
+                  <span className="text-2xl font-semibold tabular-nums max-sm:text-lg">{count}</span>
                   <span className="text-sm text-muted-foreground">{label}</span>
                 </span>
                 <ChevronRight aria-hidden className="size-5 text-muted-foreground" />

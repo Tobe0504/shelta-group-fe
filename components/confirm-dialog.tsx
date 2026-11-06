@@ -12,8 +12,24 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-/** "Are you sure?" for destructive actions. */
-export function ConfirmDialog({ title, description, confirmLabel = "Delete", onConfirm, trigger }: { title: string; description: string; confirmLabel?: string; onConfirm: () => void; trigger: React.ReactNode }) {
+/** "Are you sure?" before an action that can't be undone (destructive by default). */
+export function ConfirmDialog({
+  title,
+  description,
+  confirmLabel = "Delete",
+  cancelLabel = "Keep it",
+  variant = "destructive",
+  onConfirm,
+  trigger,
+}: {
+  title: string
+  description: string
+  confirmLabel?: string
+  cancelLabel?: string
+  variant?: "destructive" | "default"
+  onConfirm: () => void
+  trigger: React.ReactNode
+}) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -23,8 +39,8 @@ export function ConfirmDialog({ title, description, confirmLabel = "Delete", onC
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Keep it</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm}>
+          <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogAction variant={variant} onClick={onConfirm}>
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

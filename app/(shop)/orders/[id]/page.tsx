@@ -11,7 +11,7 @@ async function Order({ params }: Pick<PageProps<"/orders/[id]">, "params">) {
 
 export default function OrderPage({ params }: PageProps<"/orders/[id]">) {
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-8 max-sm:py-3">
       <Suspense fallback={<SplitSkeleton />}>
         <Order params={params} />
       </Suspense>

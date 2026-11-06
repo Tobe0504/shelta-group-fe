@@ -13,7 +13,7 @@ import { useDeleteCategory, useDeleteDepartment, useSaveCategory, useSaveDepartm
 import { useDepartments } from "@/hooks/use-catalog"
 import { slugify } from "@/lib/slug"
 import { tones } from "@/lib/tones"
-import type { Category, Department, Tone } from "@/lib/types"
+import type { Category, Department, DepartmentKind, Tone } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { CategoryIcon } from "../category-icon"
 import { ConfirmDialog } from "../confirm-dialog"
@@ -23,7 +23,7 @@ import { ListSkeleton } from "../skeletons"
 import { FormDialog } from "./form-dialog"
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim()
-const row = "flex flex-wrap items-center gap-3 rounded-2xl px-4 py-3 ring-1 ring-border"
+const row = "flex flex-wrap items-center gap-3 rounded-2xl px-4 py-3 ring-1 ring-border max-sm:gap-2 max-sm:rounded-xl max-sm:px-2.5 max-sm:py-1.5"
 
 /** Icon button used as a dialog trigger, so it forwards the props the trigger adds. */
 function EditButton({ label, ...props }: { label: string } & React.ComponentProps<typeof Button>) {
@@ -139,15 +139,15 @@ function CategoriesTab({ departments }: { departments: Department[] }) {
             {d.name}
           </h2>
           {d.categories.length ? (
-            <ul className="grid gap-2 md:grid-cols-2">
+            <ul className="grid gap-2 max-sm:gap-1.5 md:grid-cols-2">
               {d.categories.map((c) => (
                 <li key={c.slug} className={row}>
-                  <span className={cn("grid size-10 place-items-center rounded-xl", tones[c.tone].bg)}>
-                    <CategoryIcon slug={c.slug} className={cn("size-5", tones[c.tone].fg)} />
+                  <span className={cn("grid size-10 place-items-center rounded-xl max-sm:size-8 max-sm:rounded-lg", tones[c.tone].bg)}>
+                    <CategoryIcon slug={c.slug} className={cn("size-5 max-sm:size-4", tones[c.tone].fg)} />
                   </span>
                   <span className="flex flex-1 flex-col">
-                    <span className="font-medium">{c.name}</span>
-                    <span className="text-sm text-muted-foreground">{c.slug}</span>
+                    <span className="font-medium max-sm:text-sm">{c.name}</span>
+                    <span className="text-sm text-muted-foreground max-sm:text-xs">{c.slug}</span>
                   </span>
                   <CategoryDialog category={c} departments={departments} trigger={<EditButton label={`Edit ${c.name}`} />} />
                   <DeleteButton
@@ -174,12 +174,24 @@ function DepartmentDialog({ department, index, trigger }: { department?: Departm
   return (
     <FormDialog
       title={department ? `Edit ${department.name}` : "Add a department"}
-      description="Departments group categories in the menu and search filters."
+      description="Product departments group categories in the menu and filters. Service departments group the trades buyers hire."
       success={department ? "Department updated" : "Department added"}
       trigger={trigger}
-      onSave={(f) => save.mutateAsync({ slug: department?.slug ?? slugify(str(f, "name")), name: str(f, "name"), order: Number(f.get("order")) || 0 })}
+      onSave={(f) => save.mutateAsync({ slug: department?.slug ?? slugify(str(f, "name")), name: str(f, "name"), kind: str(f, "kind") as DepartmentKind, order: Number(f.get("order")) || 0 })}
     >
       <NameField id="dept-name" label="Name" defaultValue={department?.name} />
+      <Field>
+        <FieldLabel htmlFor="dept-kind">Type</FieldLabel>
+        <Select name="kind" defaultValue={department?.kind ?? "products"}>
+          <SelectTrigger id="dept-kind">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="products">Products (sold through the cart)</SelectItem>
+            <SelectItem value="services">Services (trades people hire)</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
       <OrderField defaultValue={index} />
     </FormDialog>
   )
@@ -204,7 +216,9 @@ function DepartmentsTab({ departments }: { departments: Department[] }) {
               <span className="font-medium">{d.name}</span>
               <span className="text-sm text-muted-foreground">{d.categories.map((c) => c.name).join(", ") || "No categories"}</span>
             </span>
-            <Badge variant="secondary">{d.categories.length} categories</Badge>
+            <Badge variant={d.kind === "services" ? "accent" : "secondary"}>
+              {d.kind === "services" ? "Services" : "Products"} · {d.categories.length}
+            </Badge>
             <DepartmentDialog department={d} index={i} trigger={<EditButton label={`Edit ${d.name}`} />} />
             <DeleteButton label={`Delete ${d.name}`} description="Only possible once it has no categories." onConfirm={() => remove.mutate(d.slug, { onSuccess: () => toast("Department deleted") })} />
           </li>
@@ -215,11 +229,11 @@ function DepartmentsTab({ departments }: { departments: Department[] }) {
 }
 
 export function AdminCatalogue() {
-  const { data: departments, isPending, isError } = useDepartments()
+  const { data: departments, isPending, isError } = useDepartments("all")
   const [tab, setTab] = useState("categories")
   return (
     <>
-      <PageHeader title="Catalogue" description="Categories and departments. Changes show on the site straight away." />
+      <PageHeader title="Catalogue" description="Product categories, service trades and the departments that group them. Changes show on the site straight away." />
       <Tabs value={tab} onValueChange={setTab} className="gap-6">
         <TabsList>
           <TabsTrigger value="categories">Categories</TabsTrigger>

@@ -28,7 +28,7 @@ function useStoreCart() {
 
 export function useSetCartLine() {
   const storeCart = useStoreCart()
-  return useMutation({ mutationFn: ({ productId, qty }: { productId: string; qty: number }) => cartService.setLine(productId, qty), onSuccess: storeCart })
+  return useMutation({ mutationFn: ({ productId, qty }: { productId: string; qty: number }) => cartService.setLine(productId, qty), onSuccess: storeCart, meta: { pending: "Updating cart…" } })
 }
 
 /** Adds to the current quantity. Signed-out buyers are sent to sign in first. */

@@ -16,7 +16,7 @@ async function Listings({ searchParams }: Pick<PageProps<"/real-estate">, "searc
 
 export default function RealEstatePage({ searchParams }: PageProps<"/real-estate">) {
   return (
-    <div className="container-page flex flex-col gap-8 py-8">
+    <div className="container-page flex flex-col gap-8 py-8 max-sm:gap-3 max-sm:py-3">
       <PageHeader title="Real estate" description="Land, homes and short-lets from verified developers across Nigeria." />
       <Suspense fallback={<ListSkeleton rows={2} className="h-80" />}>
         <Listings searchParams={searchParams} />

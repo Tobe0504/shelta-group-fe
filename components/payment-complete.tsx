@@ -7,7 +7,7 @@ import { useVerifyPayment } from "@/hooks/use-orders"
 import { EmptyState } from "./empty-state"
 import { RequireAuth } from "./require-auth"
 
-function Confirming() {
+export function Confirming() {
   return (
     <div role="status" className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-muted-foreground">
       <Spinner role={undefined} aria-hidden className="size-10 text-primary" />

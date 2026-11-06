@@ -1,7 +1,7 @@
 import axios from "axios"
 import { data, http } from "@/lib/http"
 
-export type UploadKind = "avatar" | "product" | "estate" | "quote"
+export type UploadKind = "avatar" | "product" | "estate" | "quote" | "pro" | "job"
 type Signature = { uploadUrl: string; apiKey: string; timestamp: number; signature: string; folder: string; allowed_formats: string; maxBytes: number }
 
 export const uploadsService = {

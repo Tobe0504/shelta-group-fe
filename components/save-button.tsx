@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button"
 import { useToggleSaved } from "@/hooks/use-account"
 import { cn } from "@/lib/utils"
 
-export function SaveButton({ productId, label, className }: { productId: string; label: string; className?: string }) {
+export function SaveButton({ productId, label, size = "icon", className }: { productId: string; label: string; size?: "icon" | "icon-sm"; className?: string }) {
   const { saved, toggle, isPending } = useToggleSaved(productId)
   return (
     <Button
       variant="outline"
-      size="icon"
+      size={size}
       aria-label={`Save ${label}`}
       aria-pressed={saved}
       disabled={isPending}

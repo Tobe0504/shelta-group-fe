@@ -21,7 +21,7 @@ const LOW_STOCK = 100
 function DashboardSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 max-sm:gap-2 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-32 rounded-3xl" />
         ))}
@@ -72,7 +72,7 @@ export function SellerDashboard() {
     <>
       {header}
       {store && !store.coords && (
-        <p role="status" className="flex flex-wrap items-center gap-3 rounded-3xl bg-deal-soft p-5 text-deal-soft-foreground">
+        <p role="status" className="flex flex-wrap items-center gap-3 rounded-3xl bg-deal-soft p-5 text-deal-soft-foreground max-sm:gap-2 max-sm:rounded-2xl max-sm:p-3 max-sm:text-sm">
           <MapPin aria-hidden className="size-5 shrink-0" />
           <span className="flex-1">Set your warehouse location so buyers see accurate delivery fees. Until then they pay the minimum fee.</span>
           <Button asChild variant="outline" size="sm" className="border-0">
@@ -81,22 +81,22 @@ export function SellerDashboard() {
         </p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 max-sm:gap-2 xl:grid-cols-4">
         <StatCard icon={Wallet} tone="blue" label="Due to you" value={formatNaira(held)} note="Released when buyers confirm" />
         <StatCard icon={Banknote} tone="mint" label="Paid out" value={formatNaira(released)} />
         <StatCard icon={ShoppingBag} tone="peach" label="Open orders" value={String(open.length)} />
         <StatCard icon={Package} tone="lilac" label="Live products" value={String(listings.filter((l) => l.status === "live").length)} note={`${listings.length} total`} />
       </div>
 
-      <div className="grid items-start gap-6 xl:grid-cols-[1fr_380px]">
+      <div className="grid items-start gap-6 max-sm:gap-3 xl:grid-cols-[1fr_380px]">
         <Card>
-          <CardHeader className="flex-row items-center justify-between px-6">
-            <CardTitle className="text-lg">Orders to handle</CardTitle>
+          <CardHeader className="flex-row items-center justify-between px-6 max-sm:px-3">
+            <CardTitle className="text-lg max-sm:text-base">Orders to handle</CardTitle>
             <Link href="/seller/orders" className="py-2 text-sm text-primary hover:underline">
               All orders
             </Link>
           </CardHeader>
-          <CardContent className="px-6">
+          <CardContent className="px-6 max-sm:px-3">
             {open.length ? (
               <ul className="flex flex-col divide-y">
                 {open.map(({ order, shipment }) => (
@@ -117,12 +117,12 @@ export function SellerDashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="px-6">
-            <CardTitle className="flex items-center gap-2 text-lg">
+          <CardHeader className="px-6 max-sm:px-3">
+            <CardTitle className="flex items-center gap-2 text-lg max-sm:text-base">
               <AlertTriangle aria-hidden className="size-5 text-deal" /> Needs restocking
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-6">
+          <CardContent className="px-6 max-sm:px-3">
             {low.length ? (
               <ul className="flex flex-col gap-3">
                 {low.map((l) => (

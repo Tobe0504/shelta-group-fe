@@ -34,10 +34,10 @@ function PhotoCard({ user }: { user: User }) {
     f && upload.mutate(f, { onSuccess: (avatar) => update.mutate({ avatar }, { onSuccess: () => toast.success("Photo updated") }), onError: (e) => toast.error(e instanceof Error ? e.message : errorMessage(e)) })
 
   return (
-    <Card className="items-center gap-4 p-6 text-center lg:sticky lg:top-32">
-      <UserAvatar user={user} className="size-28 text-3xl" />
+    <Card className="items-center gap-4 p-6 text-center max-sm:gap-2.5 max-sm:p-4 lg:sticky lg:top-32">
+      <UserAvatar user={user} className="size-28 text-3xl max-sm:size-14 max-sm:text-lg" />
       <div>
-        <p className="text-lg font-semibold">{user.name}</p>
+        <p className="text-lg font-semibold max-sm:text-base">{user.name}</p>
         <p className="text-sm text-muted-foreground">{user.email}</p>
       </div>
       <Badge variant={user.role === "buyer" ? "secondary" : "accent"}>{user.role === "buyer" ? "Buyer account" : user.role === "seller" ? "Seller account" : "Admin"}</Badge>
@@ -63,11 +63,11 @@ function DetailsCard({ user }: { user: User }) {
   const update = useUpdateProfile()
   return (
     <Card>
-      <CardHeader className="px-6">
-        <CardTitle className="text-lg">Personal details</CardTitle>
+      <CardHeader className="px-6 max-sm:px-3">
+        <CardTitle className="text-lg max-sm:text-base">Personal details</CardTitle>
         <CardDescription>Used for delivery contacts and receipts.</CardDescription>
       </CardHeader>
-      <CardContent className="px-6">
+      <CardContent className="px-6 max-sm:px-3">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -103,11 +103,11 @@ function PasswordCard() {
   const change = useChangePassword()
   return (
     <Card>
-      <CardHeader className="px-6">
-        <CardTitle className="text-lg">Password</CardTitle>
+      <CardHeader className="px-6 max-sm:px-3">
+        <CardTitle className="text-lg max-sm:text-base">Password</CardTitle>
         <CardDescription>You’ll stay signed in on this device.</CardDescription>
       </CardHeader>
-      <CardContent className="px-6">
+      <CardContent className="px-6 max-sm:px-3">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -140,11 +140,11 @@ function NotificationsCard({ user }: { user: User }) {
   const update = useUpdateProfile()
   return (
     <Card>
-      <CardHeader className="px-6">
-        <CardTitle className="text-lg">Notifications</CardTitle>
+      <CardHeader className="px-6 max-sm:px-3">
+        <CardTitle className="text-lg max-sm:text-base">Notifications</CardTitle>
         <CardDescription>How we tell you about orders and deliveries.</CardDescription>
       </CardHeader>
-      <CardContent className="px-6">
+      <CardContent className="px-6 max-sm:px-3">
         <FieldGroup>
           {notifications.map((n) => (
             <Field key={n.key} orientation="horizontal" className="justify-between">

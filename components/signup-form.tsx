@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { HardHat, Store } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -15,6 +15,7 @@ import { errorMessage, fieldErrors } from "@/lib/http"
 import type { SignUpInput } from "@/services/auth.service"
 import { ChoiceCard } from "./choice-card"
 import { PasswordInput } from "./password-input"
+import { useNavigate } from "./navigation-progress"
 
 type Role = SignUpInput["role"]
 
@@ -27,7 +28,7 @@ const strength = (pw: string) => [pw.length >= 8, /[A-Z]/.test(pw), /\d/.test(pw
 const strengthLabel = ["Too short", "Weak", "Fair", "Good", "Strong"]
 
 export function SignupForm() {
-  const router = useRouter()
+  const { navigate, pending: navigating } = useNavigate()
   const params = useSearchParams()
   const signUp = useSignUp()
   const [role, setRole] = useState<Role>(params.get("role") === "seller" ? "seller" : "buyer")
@@ -44,7 +45,7 @@ export function SignupForm() {
         const get = (k: string) => String(f.get(k) ?? "")
         signUp.mutate(
           { name: get("name"), email: get("email"), phone: get("phone"), password: get("password"), role, business: role === "seller" ? get("business") : undefined },
-          { onSuccess: () => router.push(params.get("next") ?? (role === "seller" ? "/seller" : "/")) },
+          { onSuccess: () => navigate(params.get("next") ?? (role === "seller" ? "/seller" : "/")) },
         )
       }}
     >
@@ -73,7 +74,7 @@ export function SignupForm() {
             {fieldError("business")}
           </Field>
         )}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input id="email" name="email" type="email" autoComplete="email" required />
@@ -108,7 +109,7 @@ export function SignupForm() {
             I agree to the terms and buyer protection policy
           </FieldLabel>
         </Field>
-        <Button type="submit" size="lg" loading={signUp.isPending}>
+        <Button type="submit" size="lg" loading={signUp.isPending || navigating}>
           {role === "seller" ? "Create seller account" : "Create account"}
         </Button>
         <p className="text-center text-sm text-muted-foreground">

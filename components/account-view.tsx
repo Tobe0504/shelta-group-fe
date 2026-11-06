@@ -28,7 +28,7 @@ export function AccountView() {
         const badge = orderBadge(o)
         return (
           <li key={o.id}>
-            <Link href={`/orders/${o.number}`} className="flex items-center gap-4 rounded-3xl px-5 py-4 ring-1 ring-border transition-colors hover:bg-muted">
+            <Link href={`/orders/${o.number}`} className="flex items-center gap-4 rounded-3xl px-5 py-4 max-sm:gap-2.5 max-sm:rounded-2xl max-sm:px-3 max-sm:py-2.5 max-sm:text-sm ring-1 ring-border transition-colors hover:bg-muted">
               <span className="flex flex-1 flex-col gap-1">
                 <span className="text-base font-semibold">Order {o.number}</span>
                 <span className="text-muted-foreground">

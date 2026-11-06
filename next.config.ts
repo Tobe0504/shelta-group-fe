@@ -5,6 +5,8 @@ const API_URL = process.env.API_URL ?? "http://localhost:4000";
 const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
+    // The /api proxy must outlast a sleeping API waking up (default is 30s). Keep in step with lib/http.ts.
+    proxyTimeout: 90_000,
   },
   cacheComponents: true,
   partialPrefetching: true,

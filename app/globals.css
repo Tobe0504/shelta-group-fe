@@ -148,5 +148,26 @@
   }
 }
 @utility container-page {
-  @apply mx-auto w-full max-w-[1320px] px-4 sm:px-6;
+  @apply mx-auto w-full max-w-[1320px] px-3 sm:px-6;
+}
+
+/* Horizontal rails: swipeable without a visible scrollbar. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Phones: scale everything down a touch (a percentage, so it respects the user's text-size setting). */
+@media (max-width: 639px) {
+  html {
+    font-size: 93.75%;
+  }
+
+  /* iOS zooms the page when a focused field's text is under 16px. */
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
 }

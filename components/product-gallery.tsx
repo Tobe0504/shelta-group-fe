@@ -9,10 +9,10 @@ export function ProductGallery({ images, category, name }: { images: string[]; c
   const [active, setActive] = useState(0)
   const main = images[active] ?? images[0]
   return (
-    <div className="flex flex-col gap-3">
-      <ProductImage category={category} src={main} sizes="(min-width: 1024px) 50vw, 100vw" className="rounded-[28px]" />
+    <div className="flex flex-col gap-3 max-sm:gap-1.5">
+      <ProductImage category={category} src={main} sizes="(min-width: 1024px) 50vw, 100vw" className="rounded-[28px] max-sm:aspect-4/3 max-sm:rounded-2xl" />
       {images.length > 1 && (
-        <ul aria-label={`Photos of ${name}`} className="grid grid-cols-5 gap-2.5">
+        <ul aria-label={`Photos of ${name}`} className="grid grid-cols-5 gap-2.5 max-sm:grid-cols-6 max-sm:gap-1.5">
           {images.map((src, i) => (
             <li key={src}>
               <button

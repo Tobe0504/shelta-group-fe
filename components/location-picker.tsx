@@ -60,7 +60,14 @@ function SavedSites({ onSelect }: { onSelect: (place: Place) => void }) {
 }
 
 /** Delivery-location chooser. Pass a custom trigger as `children`, or get the header button. */
-export function LocationPicker({ children }: { children?: React.ReactNode }) {
+export function LocationPicker({
+  children,
+  compact,
+}: {
+  children?: React.ReactNode;
+  /** A single small line, for the slim bar on phones. */
+  compact?: boolean;
+}) {
   const { location, setLocation, isPending } = useDeliveryLocation();
   const [open, setOpen] = useState(false);
   const pick = (place: Place) => {
@@ -71,7 +78,16 @@ export function LocationPicker({ children }: { children?: React.ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {children ?? (
+        {children ?? (compact ? (
+          <button
+            type="button"
+            aria-label={`Deliver to ${location.area}. Change location`}
+            className="mr-auto flex h-full min-w-0 items-center gap-1 text-left"
+          >
+            <MapPin aria-hidden className="size-3.5 shrink-0" />
+            <span className="truncate font-semibold">{location.area}</span>
+          </button>
+        ) : (
           <button
             type="button"
             className="flex min-h-11 max-w-56 items-center gap-2 rounded-full px-2 text-left text-sm hover:bg-secondary"
@@ -86,7 +102,7 @@ export function LocationPicker({ children }: { children?: React.ReactNode }) {
               )}
             </span>
           </button>
-        )}
+        ))}
       </DialogTrigger>
       {/* The dialog is a grid: min-w-0 on its children lets long addresses truncate instead of widening it. */}
       <DialogContent className="max-h-[85vh] gap-5 overflow-x-hidden overflow-y-auto sm:max-w-lg [&>*]:min-w-0">

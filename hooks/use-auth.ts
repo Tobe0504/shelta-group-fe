@@ -39,6 +39,7 @@ export function useSignOut() {
   const router = useRouter()
   return useMutation({
     mutationFn: authService.signOut,
+    meta: { pending: "Signing out…" },
     onSettled: () => {
       client.setQueryData(keys.me, null)
       ;[keys.cart, keys.saved, keys.sites, keys.orders, keys.seller.all, keys.admin.all].forEach((queryKey) => client.removeQueries({ queryKey }))

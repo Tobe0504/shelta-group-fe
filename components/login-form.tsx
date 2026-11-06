@@ -1,13 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useSignIn } from "@/hooks/use-auth"
 import { errorMessage } from "@/lib/http"
 import { PasswordInput } from "./password-input"
+import { useNavigate } from "./navigation-progress"
 
 /** Demo accounts created by the API seed (development only). */
 const demoAccounts = [
@@ -17,12 +18,12 @@ const demoAccounts = [
 const DEMO_PASSWORD = "Password123!"
 
 export function LoginForm() {
-  const router = useRouter()
+  const { navigate, pending: navigating } = useNavigate()
   const next = useSearchParams().get("next")
   const signIn = useSignIn()
 
   const submit = (body: { email: string; password: string }) =>
-    signIn.mutate(body, { onSuccess: (user) => router.push(next ?? ({ seller: "/seller", admin: "/admin", buyer: "/" } as const)[user.role]) })
+    signIn.mutate(body, { onSuccess: (user) => navigate(next ?? ({ seller: "/seller", admin: "/admin", buyer: "/" } as const)[user.role]) })
 
   return (
     <form
@@ -47,7 +48,7 @@ export function LoginForm() {
           </div>
           <PasswordInput id="password" name="password" autoComplete="current-password" required />
         </Field>
-        <Button type="submit" size="lg" loading={signIn.isPending}>
+        <Button type="submit" size="lg" loading={signIn.isPending || navigating}>
           Sign in
         </Button>
         <FieldSeparator>Or try a demo account</FieldSeparator>

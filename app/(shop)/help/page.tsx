@@ -12,15 +12,15 @@ const sections = [
 
 export default function HelpPage() {
   return (
-    <div className="container-page flex flex-col gap-8 py-8">
+    <div className="container-page flex flex-col gap-8 py-8 max-sm:gap-3 max-sm:py-3">
       <PageHeader title="Help" description="How buying, delivery and payments work on SheltaMart." />
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 max-sm:gap-2 md:grid-cols-2">
         {sections.map((s) => (
-          <section key={s.id} id={s.id} aria-labelledby={`${s.id}-h`} className="scroll-mt-32 rounded-3xl bg-muted p-6">
-            <h2 id={`${s.id}-h`} className="mb-2 text-xl">
+          <section key={s.id} id={s.id} aria-labelledby={`${s.id}-h`} className="scroll-mt-32 rounded-3xl bg-muted p-6 max-sm:rounded-2xl max-sm:p-3.5">
+            <h2 id={`${s.id}-h`} className="mb-2 text-xl max-sm:mb-1 max-sm:text-base">
               {s.title}
             </h2>
-            <p className="leading-relaxed text-muted-foreground">{s.body}</p>
+            <p className="leading-relaxed text-muted-foreground max-sm:text-sm max-sm:leading-normal">{s.body}</p>
           </section>
         ))}
       </div>

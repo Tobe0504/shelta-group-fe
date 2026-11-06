@@ -39,6 +39,7 @@ type ShipmentAction =
 export function useShipmentAction(number: string) {
   const client = useQueryClient()
   return useMutation({
+    meta: { pending: "Updating delivery…" },
     mutationFn: ({ id, action }: { id: string; action: ShipmentAction }) =>
       action.type === "confirm"
         ? ordersService.confirm(number, id)

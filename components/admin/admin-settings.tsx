@@ -25,11 +25,11 @@ const amount = (value: string) => Math.max(0, Math.round(Number(value) || 0))
 function Section({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
     <Card>
-      <CardHeader className="px-6">
-        <CardTitle className="text-lg">{title}</CardTitle>
+      <CardHeader className="px-6 max-sm:px-3">
+        <CardTitle className="text-lg max-sm:text-base">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="px-6">
+      <CardContent className="px-6 max-sm:px-3">
         <FieldGroup>{children}</FieldGroup>
       </CardContent>
     </Card>
@@ -53,7 +53,8 @@ function NumberField({ id, label, value, onChange, prefix, suffix, help, step }:
 function SettingsForm({ initial }: { initial: MarketplaceSettings }) {
   const [s, setS] = useState(initial)
   const update = useUpdateSettings()
-  const categories = useDepartments().data?.flatMap((d) => d.categories) ?? []
+  // Overrides apply to product categories and service trades alike.
+  const categories = useDepartments("all").data?.flatMap((d) => d.categories) ?? []
   const set = (patch: Partial<MarketplaceSettings>) => setS((x) => ({ ...x, ...patch }))
   const unused = categories.filter((c) => !s.categoryCommission.some((o) => o.category === c.slug))
 
@@ -61,7 +62,7 @@ function SettingsForm({ initial }: { initial: MarketplaceSettings }) {
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        const { commissionRate, categoryCommission, offloadFee, serviceFee, deliveryWindows, deliveryDaysAhead, payoutDelayHours, deliveryBaseFee, deliveryPerKm, deliveryMinFee, roadFactor, maxDeliveryKm } = s
+        const { commissionRate, categoryCommission, offloadFee, serviceFee, deliveryWindows, deliveryDaysAhead, payoutDelayHours, deliveryBaseFee, deliveryPerKm, deliveryMinFee, roadFactor, maxDeliveryKm, jobQuoteLimit, serviceCommissionRate } = s
         update.mutate(
           {
             commissionRate,
@@ -76,11 +77,13 @@ function SettingsForm({ initial }: { initial: MarketplaceSettings }) {
             deliveryMinFee,
             roadFactor,
             maxDeliveryKm,
+            jobQuoteLimit,
+            serviceCommissionRate,
           },
           { onSuccess: (saved) => (setS(saved), toast.success("Settings saved. New orders use them straight away.")) },
         )
       }}
-      className="grid items-start gap-6 lg:grid-cols-2"
+      className="grid items-start gap-6 max-sm:gap-3 lg:grid-cols-2"
     >
       <Section title="Commission" description="What SheltaMart keeps from the goods value of each delivery. Existing orders keep the rate they were placed with.">
         <NumberField id="commission" label="Default commission" value={pct(s.commissionRate)} onChange={(v) => set({ commissionRate: toRate(v) })} suffix="%" step={0.1} />
@@ -125,7 +128,7 @@ function SettingsForm({ initial }: { initial: MarketplaceSettings }) {
       </Section>
 
       <Section title="Delivery pricing" description="Each truck costs base + rate × road distance from the seller’s warehouse, never below the minimum.">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
           <NumberField id="base" label="Base fee" value={s.deliveryBaseFee} onChange={(v) => set({ deliveryBaseFee: amount(v) })} prefix="₦" />
           <NumberField id="perkm" label="Rate per km" value={s.deliveryPerKm} onChange={(v) => set({ deliveryPerKm: amount(v) })} prefix="₦" />
           <NumberField id="min" label="Minimum fee" value={s.deliveryMinFee} onChange={(v) => set({ deliveryMinFee: amount(v) })} prefix="₦" />
@@ -172,6 +175,11 @@ function SettingsForm({ initial }: { initial: MarketplaceSettings }) {
         <NumberField id="delay" label="Wait before paying out" value={s.payoutDelayHours} onChange={(v) => set({ payoutDelayHours: amount(v) })} suffix="hours" help="0 pays immediately. With a delay, use “Run due payouts” on the overview." />
       </Section>
 
+      <Section title="Services" description="Job requests and escrow. Trades can have their own rate in the commission overrides.">
+        <NumberField id="service-commission" label="Commission on service jobs" value={pct(s.serviceCommissionRate)} onChange={(v) => set({ serviceCommissionRate: toRate(v) })} suffix="%" step={0.1} help="Kept from each stage when the buyer releases it. Existing releases keep their rate." />
+        <NumberField id="quotes" label="Quotes per job" value={s.jobQuoteLimit} onChange={(v) => set({ jobQuoteLimit: Math.min(20, Math.max(1, amount(v))) })} suffix="quotes" help="Once a job has this many quotes, it stops showing to other pros." />
+      </Section>
+
       <div className="lg:col-span-2">
         <Button type="submit" size="lg" loading={update.isPending}>
           Save settings
@@ -187,7 +195,7 @@ export function AdminSettings() {
     <>
       <PageHeader title="Fees & delivery" description="Marketplace-wide rules. Changes apply to new orders only." />
       {isPending ? (
-        <div className="grid items-start gap-6 lg:grid-cols-2">
+        <div className="grid items-start gap-6 max-sm:gap-3 lg:grid-cols-2">
           <FormSkeleton fields={3} />
           <FormSkeleton fields={2} />
         </div>

@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import { Building2, Hotel, House, MapPin, Trees } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -7,7 +8,7 @@ import { formatNaira } from "@/lib/format"
 import { tones } from "@/lib/tones"
 import type { Estate, EstateKind } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import { EnquiryDialog } from "./enquiry-dialog"
+import { EstateEnquire } from "./estate-enquire"
 
 export const kindIcons: Record<EstateKind, typeof House> = { Land: Trees, Apartment: Building2, House, "Short-let": Hotel }
 
@@ -15,41 +16,36 @@ export function EstateCard({ estate }: { estate: Estate }) {
   const tone = tones[estate.tone]
   const Icon = kindIcons[estate.kind]
   return (
-    <Card className="h-full gap-3 p-3">
-      <span aria-hidden className={cn("relative grid aspect-[16/10] place-items-center overflow-hidden rounded-2xl", tone.bg)}>
+    <Card className="relative h-full gap-3 p-3 transition-colors hover:bg-muted/40 max-sm:gap-1.5 max-sm:p-2">
+      <span aria-hidden className={cn("relative grid aspect-[16/10] place-items-center overflow-hidden rounded-2xl max-sm:rounded-xl", tone.bg)}>
         {estate.images?.[0] ? (
           <Image src={estate.images[0]} alt="" fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
         ) : (
-          <Icon className={cn("size-10", tone.fg)} strokeWidth={1.6} />
+          <Icon className={cn("size-10 max-sm:size-7", tone.fg)} strokeWidth={1.6} />
         )}
       </span>
-      <div className="flex flex-1 flex-col gap-1 px-1">
-        <Badge variant="outline" className="mb-1 bg-background">
+      <div className="flex flex-1 flex-col gap-1 px-1 max-sm:gap-0.5 max-sm:px-0.5">
+        <Badge variant="outline" className="mb-1 bg-background max-sm:mb-0 max-sm:h-5 max-sm:px-1.5 max-sm:text-[11px]">
           {estate.kind}
         </Badge>
-        <h3 className="text-base">{estate.name}</h3>
-        <p className="flex items-center gap-1 text-sm text-muted-foreground">
-          <MapPin aria-hidden className="size-3.5" /> {estate.area}, {estate.city}
+        <h3 className="text-base max-sm:line-clamp-1 max-sm:text-sm">
+          <Link href={`/real-estate/${estate.slug}`} className="after:absolute after:inset-0 hover:text-primary focus-visible:underline">
+            {estate.name}
+          </Link>
+        </h3>
+        <p className="flex items-center gap-1 text-sm text-muted-foreground max-sm:text-xs">
+          <MapPin aria-hidden className="size-3.5 shrink-0 max-sm:size-3" /> {estate.area}, {estate.city}
         </p>
-        {estate.detail && <p className="text-sm text-muted-foreground">{estate.detail}</p>}
-        <p className="mt-auto pt-2 text-lg font-semibold tabular-nums">
-          {formatNaira(estate.price)} {estate.per && <span className="text-sm font-medium text-muted-foreground">{estate.per}</span>}
+        {estate.detail && <p className="text-sm text-muted-foreground max-sm:line-clamp-1 max-sm:text-xs">{estate.detail}</p>}
+        <p className="mt-auto pt-2 text-lg font-semibold tabular-nums max-sm:pt-1 max-sm:text-sm">
+          {formatNaira(estate.price)} {estate.per && <span className="text-sm font-medium text-muted-foreground max-sm:text-xs">{estate.per}</span>}
         </p>
       </div>
-      <EnquiryDialog
-        topic="estate"
-        target={estate.slug}
-        title={`Enquire about ${estate.name}`}
-        description={`${estate.area}, ${estate.city}`}
-        reasons={estate.kind === "Short-let" ? ["Check dates", "Group booking", "Amenities"] : ["Book an inspection", "Payment plans", "Documents"]}
-        placeholder="Your question for the developer"
-        submitLabel="Send enquiry"
-        success="Enquiry sent. The developer will contact you."
-      >
-        <Button variant="soft" size="sm">
+      <EstateEnquire estate={estate}>
+        <Button variant="soft" size="sm" className="relative z-10 max-sm:h-7 max-sm:text-xs">
           Enquire
         </Button>
-      </EnquiryDialog>
+      </EstateEnquire>
     </Card>
   )
 }

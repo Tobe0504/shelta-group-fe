@@ -6,7 +6,7 @@ import { Logo } from "@/components/logo"
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="grid min-h-svh lg:grid-cols-[1fr_minmax(0,560px)] xl:grid-cols-2">
-      <div className="flex flex-col gap-10 px-5 py-6 sm:px-10">
+      <div className="flex flex-col gap-10 px-5 py-6 max-sm:gap-5 max-sm:px-4 max-sm:py-4 sm:px-10">
         <Logo />
         <main id="main" className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
           {children}

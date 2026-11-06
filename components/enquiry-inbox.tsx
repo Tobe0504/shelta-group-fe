@@ -39,10 +39,10 @@ function MessageCard({ enquiry, setStatus }: { enquiry: Enquiry; setStatus: SetS
   const greeting = `Hi ${enquiry.name.split(" ")[0]}, thanks for your message about ${subject?.name ?? "your enquiry"} on SheltaMart.`
 
   return (
-    <Card className="gap-4 px-5 py-5 sm:px-6">
+    <Card className="gap-4 px-5 py-5 max-sm:gap-2.5 max-sm:p-3 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg">{enquiry.name}</h2>
+          <h2 className="text-lg max-sm:text-base">{enquiry.name}</h2>
           <p className="text-sm text-muted-foreground">
             {formatDay(enquiry.createdAt)}
             {subject && (
@@ -124,7 +124,7 @@ export function EnquiryInbox({
           ))}
         </ul>
       ) : (
-        <p className="rounded-3xl bg-muted p-12 text-center text-muted-foreground">{filter === "new" ? "You’re all caught up." : "Nothing here."}</p>
+        <EmptyState>{filter === "new" ? "You’re all caught up." : "Nothing here."}</EmptyState>
       )}
     </>
   )

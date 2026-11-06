@@ -13,7 +13,7 @@ async function Complete({ searchParams }: Pick<PageProps<"/checkout/complete">, 
 /** Paystack redirects here after payment with `?reference=…`. */
 export default function PaymentCompletePage({ searchParams }: PageProps<"/checkout/complete">) {
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-8 max-sm:py-3">
       <Suspense fallback={<Spinner className="mx-auto my-[25vh] size-10 text-primary" />}>
         <Complete searchParams={searchParams} />
       </Suspense>

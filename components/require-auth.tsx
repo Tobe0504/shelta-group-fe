@@ -32,11 +32,11 @@ export function RequireAuth({
     );
   const seller = role === "seller";
   return (
-    <div className="mx-auto my-auto flex max-w-md flex-col items-center gap-4 rounded-3xl bg-muted p-10 text-center">
+    <div className="mx-auto my-auto flex max-w-md flex-col items-center gap-4 rounded-3xl bg-muted p-10 text-center max-sm:gap-3 max-sm:rounded-2xl max-sm:p-6">
       <span className="grid size-14 place-items-center rounded-2xl bg-accent text-primary">
         <Lock aria-hidden className="size-6" />
       </span>
-      <h1 className="text-2xl">
+      <h1 className="text-2xl max-sm:text-lg">
         {seller ? "Seller account needed" : "Sign in to continue"}
       </h1>
       <p className="text-muted-foreground">

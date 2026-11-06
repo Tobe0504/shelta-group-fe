@@ -19,7 +19,7 @@ export function EnquiryDialog({ topic, target, ...props }: Props) {
       {...props}
       fields={
         needsContact && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="enq-name">Your name</Label>
               <Input id="enq-name" name="name" required autoComplete="name" defaultValue={me?.name} />

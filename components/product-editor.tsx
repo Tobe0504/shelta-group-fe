@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useRef, useState } from "react"
 import { Check, ImagePlus, Plus, Trash2, X } from "lucide-react"
 import { toast } from "sonner"
@@ -24,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { PageHeader } from "./page-header"
 import { ProductCard } from "./product-card"
 import { ProductImage } from "./product-image"
+import { useNavigate } from "./navigation-progress"
 
 const steps = ["Details", "Pricing", "Stock & delivery", "Photos", "Review"]
 const MAX_PHOTOS = 4
@@ -74,7 +74,7 @@ function Stepper({ current, reached, onPick }: { current: number; reached: numbe
 
 /** Multi-step create/edit flow for a seller listing. Each step is its own form so native validation gates "Continue". */
 export function ProductEditor({ initial }: { initial?: Listing }) {
-  const router = useRouter()
+  const { navigate, pending: navigating } = useNavigate()
   const save = useSaveListing(initial?.slug)
   const upload = useUpload("product")
   const departments = useDepartments()
@@ -99,7 +99,7 @@ export function ProductEditor({ initial }: { initial?: Listing }) {
     save.mutate(body, {
       onSuccess: (listing) => {
         toast.success(status === "live" ? `“${listing.name}” is live` : "Saved as draft")
-        router.push("/seller/products")
+        navigate("/seller/products")
       },
     })
   }
@@ -119,7 +119,7 @@ export function ProductEditor({ initial }: { initial?: Listing }) {
 
   const nav = (
     <div className="flex flex-wrap justify-between gap-3 border-t pt-5">
-      <Button type="button" variant="ghost" onClick={() => (step ? setStep(step - 1) : router.push("/seller/products"))}>
+      <Button type="button" variant="ghost" onClick={() => (step ? setStep(step - 1) : navigate("/seller/products"))}>
         {step ? "Back" : "Cancel"}
       </Button>
       <Button type="submit">Continue</Button>
@@ -136,7 +136,7 @@ export function ProductEditor({ initial }: { initial?: Listing }) {
       <Stepper current={step} reached={reached} onPick={setStep} />
 
       <div className="grid items-start gap-6 xl:grid-cols-[1fr_300px]">
-        <Card className="px-5 py-6 sm:px-8">
+        <Card className="px-5 py-6 max-sm:px-3 max-sm:py-3.5 sm:px-8">
           {step === 0 && (
             <form onSubmit={next}>
               <FieldGroup>
@@ -145,7 +145,7 @@ export function ProductEditor({ initial }: { initial?: Listing }) {
                   <Input id="name" required value={p.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Dangote 3X Cement 42.5R, 50 kg" />
                   <FieldDescription>Include brand, grade and size so buyers find it.</FieldDescription>
                 </Field>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
                   <Field>
                     <FieldLabel htmlFor="category">Category</FieldLabel>
                     {departments.isPending ? (
@@ -263,7 +263,7 @@ export function ProductEditor({ initial }: { initial?: Listing }) {
           {step === 2 && (
             <form onSubmit={next}>
               <FieldGroup>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
                   <Field>
                     <FieldLabel htmlFor="stock">In stock</FieldLabel>
                     <InputGroup>
@@ -370,7 +370,7 @@ export function ProductEditor({ initial }: { initial?: Listing }) {
                   <Button variant="secondary" disabled={save.isPending || uploading > 0} onClick={() => finish("draft")}>
                     Save as draft
                   </Button>
-                  <Button loading={save.isPending} disabled={uploading > 0} onClick={() => finish(p.stock ? "live" : "out-of-stock")}>
+                  <Button loading={save.isPending || navigating} disabled={uploading > 0} onClick={() => finish(p.stock ? "live" : "out-of-stock")}>
                     {initial ? "Save and publish" : "Publish product"}
                   </Button>
                 </div>

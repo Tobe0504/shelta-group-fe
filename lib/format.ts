@@ -22,3 +22,6 @@ export const whatsappLink = (phone: string, text?: string) => {
   const digits = phone.replace(/\D/g, "").replace(/^0/, "234")
   return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ""}`
 }
+
+/** A pro's starting price, e.g. "From ₦6,000 / m²" or "From ₦250,000 a job". */
+export const formatRate = (rate: { amount: number; unit: string }) => `From ${formatNaira(rate.amount)} ${rate.unit === "job" ? "a job" : `/ ${rate.unit}`}`

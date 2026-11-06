@@ -4,7 +4,7 @@ export function Logo() {
   return (
     <Link
       href="/"
-      className="flex items-center gap-2.5 text-xl font-semibold tracking-tight"
+      className="flex items-center gap-2.5 text-xl font-semibold tracking-tight max-sm:text-lg"
     >
       SheltaMart
     </Link>

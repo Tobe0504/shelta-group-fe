@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAdminEstates, useDeleteEstate, useSaveEstate, useToggleEstate } from "@/hooks/use-admin"
 import { estateKinds } from "@/lib/data"
@@ -18,6 +19,7 @@ import type { Estate, EstateKind, Tone } from "@/lib/types"
 import { ConfirmDialog } from "../confirm-dialog"
 import { EmptyState } from "../empty-state"
 import { ImageUploader, readImages } from "../image-uploader"
+import { MapPicker, readLocation } from "../map-picker"
 import { PageHeader } from "../page-header"
 import { ListSkeleton } from "../skeletons"
 import { FormDialog } from "./form-dialog"
@@ -43,6 +45,7 @@ function PropertyDialog({ estate, trigger }: { estate?: Estate; trigger: React.R
       trigger={trigger}
       onSave={(f) => {
         const text = (k: string) => String(f.get(k) ?? "").trim() || undefined
+        const location = readLocation(f)
         return save.mutateAsync({
           slug: estate?.slug,
           body: {
@@ -52,6 +55,9 @@ function PropertyDialog({ estate, trigger }: { estate?: Estate; trigger: React.R
             area: text("area")!,
             city: text("city")!,
             detail: text("detail"),
+            address: location?.address,
+            coords: location?.coords ?? null,
+            description: text("description"),
             per: text("per"),
             developer: text("developer"),
             price: Number(f.get("price")),
@@ -61,7 +67,7 @@ function PropertyDialog({ estate, trigger }: { estate?: Estate; trigger: React.R
         })
       }}
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 max-sm:gap-3 sm:grid-cols-2">
         <Field>
           <FieldLabel htmlFor="p-kind">Type</FieldLabel>
           <Select name="kind" defaultValue={estate?.kind ?? "Land"}>
@@ -108,7 +114,12 @@ function PropertyDialog({ estate, trigger }: { estate?: Estate; trigger: React.R
           <FieldLabel htmlFor="p-active">Show on the site</FieldLabel>
         </Field>
       </div>
-      <ImageUploader name="images" kind="estate" label="Photos" initial={estate?.images} />
+      <MapPicker initial={{ address: estate?.address, coords: estate?.coords }} />
+      <Field>
+        <FieldLabel htmlFor="p-description">Description</FieldLabel>
+        <Textarea id="p-description" name="description" maxLength={5000} className="min-h-32" defaultValue={estate?.description} placeholder="Layout, title documents, amenities, payment plans, nearby landmarks" />
+      </Field>
+      <ImageUploader name="images" kind="estate" label="Photos" initial={estate?.images} max={12} />
     </FormDialog>
   )
 }

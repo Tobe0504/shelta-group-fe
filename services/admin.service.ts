@@ -21,6 +21,7 @@ export const adminService = {
   updatePromo: (id: string, body: Partial<PromoInput>) => http.patch(`/admin/promos/${id}`, body).then(data<AdminPromo>),
   deletePromo: (id: string) => http.delete(`/admin/promos/${id}`),
 
+  quote: (id: string) => http.get(`/admin/quotes/${id}`).then(data<Quote>),
   estates: () => http.get("/admin/estates").then(data<Estate[]>),
   createEstate: (body: EstateInput) => http.post("/admin/estates", body).then(data<Estate>),
   updateEstate: (slug: string, body: Partial<EstateInput>) => http.patch(`/admin/estates/${slug}`, body).then(data<Estate>),

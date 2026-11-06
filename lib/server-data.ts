@@ -15,3 +15,9 @@ export async function load<T>(read: () => Promise<T>): Promise<T> {
     throw error
   }
 }
+
+/** Like `load`, but resolves to null on any failure. For metadata, where a missing record shouldn't break the page. */
+export async function loadOrNull<T>(read: () => Promise<T>): Promise<T | null> {
+  await connection()
+  return read().catch(() => null)
+}

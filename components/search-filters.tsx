@@ -1,15 +1,16 @@
 "use client"
 
-import { usePathname, useRouter } from "next/navigation"
-import { useTransition } from "react"
+import { usePathname } from "next/navigation"
 import { SlidersHorizontal, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
+import { Spinner } from "@/components/ui/spinner"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import type { Department } from "@/lib/types"
+import { useNavigate } from "./navigation-progress"
 
 export type Filters = { q?: string; category?: string; brands?: string[]; deals?: boolean; sort?: "best" | "price-asc" | "price-desc" }
 
@@ -53,10 +54,9 @@ function Group({ legend, children }: { legend: string; children: React.ReactNode
 
 /** Live filters: every change updates the URL, so results, back button and sharing all work. */
 export function SearchFilters({ filters, departments, brands }: { filters: Filters; departments: Department[]; brands: string[] }) {
-  const router = useRouter()
   const pathname = usePathname()
-  const [pending, start] = useTransition()
-  const update = (patch: Partial<Filters>) => start(() => router.replace(toUrl({ ...filters, ...patch }), { scroll: false }))
+  const { navigate, pending } = useNavigate()
+  const update = (patch: Partial<Filters>) => navigate(toUrl({ ...filters, ...patch }), { replace: true, scroll: false })
   const active = [
     filters.q && { label: `“${filters.q}”`, clear: { q: undefined } },
     filters.category && { label: departments.flatMap((d) => d.categories).find((c) => c.slug === filters.category)?.name ?? filters.category, clear: { category: undefined } },
@@ -113,43 +113,45 @@ export function SearchFilters({ filters, departments, brands }: { filters: Filte
 
   return (
     <>
-      {active.length > 0 && (
-        <ul aria-label="Active filters" className="flex flex-wrap gap-2 lg:hidden">
-          {active.map((a) => (
-            <li key={a.label}>
-              <Button variant="secondary" size="sm" onClick={() => update(a.clear)}>
-                {a.label} <X aria-hidden />
-                <span className="sr-only">Remove filter</span>
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <div className="flex items-center gap-2 lg:hidden">
+      <div className="flex flex-wrap items-center gap-2 max-sm:gap-1.5 lg:hidden">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="secondary">
-              <SlidersHorizontal aria-hidden /> Filters &amp; sort
+            <Button variant="secondary" size="sm">
+              {pending ? <Spinner aria-label="Updating results" /> : <SlidersHorizontal aria-hidden />} Filters &amp; sort
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>Filters &amp; sort</SheetTitle>
+              <SheetTitle className="flex items-center gap-2">Filters &amp; sort {pending && <Spinner aria-label="Updating results" className="size-4 text-primary" />}</SheetTitle>
             </SheetHeader>
             <div className="px-4 pb-8">{panel}</div>
           </SheetContent>
         </Sheet>
         {active.length > 0 && (
-          <Button variant="ghost" onClick={() => router.replace(pathname)}>
+          <ul aria-label="Active filters" className="contents">
+            {active.map((a) => (
+              <li key={a.label}>
+                <Button variant="secondary" size="sm" onClick={() => update(a.clear)}>
+                  {a.label} <X aria-hidden />
+                  <span className="sr-only">Remove filter</span>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {active.length > 1 && (
+          <Button variant="ghost" size="sm" onClick={() => navigate(pathname, { replace: true })}>
             Clear all
           </Button>
         )}
       </div>
       <div className="hidden lg:sticky lg:top-32 lg:block lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto lg:pr-2">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg">Filters</h2>
+          <h2 className="flex items-center gap-2 text-lg max-sm:text-base">
+            Filters {pending && <Spinner aria-label="Updating results" className="size-4 text-primary" />}
+          </h2>
           {active.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => router.replace(pathname)}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(pathname, { replace: true })}>
               Clear all
             </Button>
           )}

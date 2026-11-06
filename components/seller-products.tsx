@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsCount, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useDepartments } from "@/hooks/use-catalog"
 import { useDeleteListing, useListings, useUpdateListing } from "@/hooks/use-seller"
 import { formatNaira } from "@/lib/format"
@@ -85,7 +85,8 @@ export function SellerProducts() {
           <TabsList>
             {(["all", "live", "draft", "out-of-stock"] as const).map((t) => (
               <TabsTrigger key={t} value={t}>
-                {t === "all" ? "All" : statusBadge[t].label} ({t === "all" ? listings.length : listings.filter((l) => l.status === t).length})
+                {t === "all" ? "All" : statusBadge[t].label}
+                <TabsCount>{t === "all" ? listings.length : listings.filter((l) => l.status === t).length}</TabsCount>
               </TabsTrigger>
             ))}
           </TabsList>

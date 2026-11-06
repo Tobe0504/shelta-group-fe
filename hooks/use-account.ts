@@ -30,6 +30,7 @@ export function useToggleSaved(productId: string) {
 
   const mutation = useMutation({
     mutationFn: () => (saved ? accountService.unsave(productId) : accountService.save(productId)),
+    meta: { pending: saved ? "Removing…" : "Saving…" },
     onSuccess: (products) => {
       client.setQueryData(keys.saved, products)
       client.setQueryData<User | null>(keys.me, (u) => u && { ...u, saved: products.map((p) => p.id) })
