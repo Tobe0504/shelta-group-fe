@@ -25,3 +25,15 @@ export const whatsappLink = (phone: string, text?: string) => {
 
 /** A pro's starting price, e.g. "From ₦6,000 / m²" or "From ₦250,000 a job". */
 export const formatRate = (rate: { amount: number; unit: string }) => `From ${formatNaira(rate.amount)} ${rate.unit === "job" ? "a job" : `/ ${rate.unit}`}`
+
+const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" })
+/** "5 minutes ago", "yesterday", or a date for anything older than a week. */
+export function timeAgo(iso: string) {
+  const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60_000)
+  if (minutes < 1) return "just now"
+  if (minutes < 60) return relative.format(-minutes, "minute")
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return relative.format(-hours, "hour")
+  const days = Math.round(hours / 24)
+  return days < 7 ? relative.format(-days, "day") : formatDay(iso)
+}

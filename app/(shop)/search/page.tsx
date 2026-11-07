@@ -19,6 +19,7 @@ function toFilters(params: Awaited<PageProps<"/search">["searchParams"]>): Filte
   return {
     q: first(params.q),
     category: first(params.category) || undefined,
+    department: first(params.department) || undefined,
     brands: params.brand ? [params.brand].flat() : [],
     deals: first(params.deals) === "1",
     sort: sorts.find((s) => s === sort) ?? "best",
@@ -29,14 +30,15 @@ async function Results({ searchParams }: Pick<PageProps<"/search">, "searchParam
   const filters = toFilters(await searchParams)
   const [results, departments, brands, promos] = await load(() =>
     Promise.all([
-      productsService.search({ q: filters.q, category: filters.category, brand: filters.brands, deals: filters.deals || undefined, sort: filters.sort, limit: 48 }),
+      productsService.search({ q: filters.q, category: filters.category, department: filters.department, brand: filters.brands, deals: filters.deals || undefined, sort: filters.sort, limit: 48 }),
       catalogService.departments(),
       productsService.brands(filters.category),
       catalogService.promos(filters.category),
     ]),
   )
   const category = departments.flatMap((d) => d.categories).find((c) => c.slug === filters.category)
-  const title = filters.q ? `Results for “${filters.q}”` : (category?.name ?? (filters.deals ? "Deals" : "All products"))
+  const department = departments.find((d) => d.slug === filters.department)
+  const title = filters.q ? `Results for “${filters.q}”` : (category?.name ?? department?.name ?? (filters.deals ? "Deals" : "All products"))
 
   return (
     <>

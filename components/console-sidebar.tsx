@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useMe } from "@/hooks/use-auth"
 import { Logo } from "./logo"
+import { NotificationBell } from "./notification-bell"
 import { UserAvatar } from "./user-avatar"
 
 export type ConsoleNavItem = { href: string; label: string; icon: LucideIcon }
@@ -59,7 +60,13 @@ export function ConsoleSidebar({ title, nav, badges, subtitle }: Props) {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <Logo />
+        <div className="flex items-center justify-between max-md:hidden">
+          <Logo />
+          <NotificationBell className="size-9" align="start" />
+        </div>
+        <div className="md:hidden">
+          <Logo />
+        </div>
         <p className="pl-1 text-xs text-muted-foreground">{title}</p>
       </SidebarHeader>
       <SidebarContent>

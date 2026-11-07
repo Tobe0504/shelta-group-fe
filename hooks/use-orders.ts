@@ -7,6 +7,9 @@ import { ordersService } from "@/services/orders.service"
 
 export const useOrders = () => useQuery({ queryKey: keys.orders, queryFn: ordersService.list })
 export const useOrder = (number: string) => useQuery({ queryKey: keys.order(number), queryFn: () => ordersService.get(number) })
+/** A shipment's reschedule options, from its store's own schedule. */
+export const useShipmentSlots = (number: string, id: string, enabled: boolean) =>
+  useQuery({ queryKey: [...keys.order(number), "slots", id], queryFn: () => ordersService.slots(number, id), enabled })
 
 /** Places the order and sends the buyer to Paystack. */
 export const useCheckout = () =>

@@ -20,6 +20,13 @@ export const keys = {
     orders: ["seller", "orders"] as const,
     enquiries: ["seller", "enquiries"] as const,
   },
+  notifications: ["notifications"] as const,
+  spotlight: (q: string) => ["spotlight", q] as const,
+  /** Prefix of every messaging query, for refreshing after live updates. */
+  chats: ["chats"] as const,
+  conversations: (scope: string) => ["chats", "list", scope] as const,
+  thread: (id: string) => ["chats", "thread", id] as const,
+  unreadChats: ["chats", "unread"] as const,
   jobs: ["jobs"] as const,
   job: (id: string) => ["jobs", id] as const,
   pro: {
@@ -42,5 +49,6 @@ export const keys = {
     estates: ["admin", "estates"] as const,
     pros: ["admin", "pros"] as const,
     escrow: ["admin", "escrow"] as const,
+    escrowOrders: ["admin", "escrow", "orders"] as const,
   },
 }

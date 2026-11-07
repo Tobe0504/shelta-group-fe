@@ -109,7 +109,7 @@ export function EnquiryInbox({
 
   return (
     <>
-      <PageHeader title={title} description={description} />
+      {title && <PageHeader title={title} description={description} />}
       <StatusFilter label="Filter messages" options={options} value={filter} onChange={setFilter} />
       {query.isPending ? (
         <ListSkeleton rows={3} className="h-44" />

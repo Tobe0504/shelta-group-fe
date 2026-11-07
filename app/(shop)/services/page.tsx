@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Suspense } from "react"
-import { BadgeCheck, ClipboardList, MessageSquareQuote, Search } from "lucide-react"
+import { BadgeCheck, ClipboardList, MessageSquareQuote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { InfoTile } from "@/components/info-tile"
 import { PageHeader } from "@/components/page-header"
@@ -9,7 +9,6 @@ import { ProList } from "@/components/pro-card"
 import { Section } from "@/components/section"
 import { ListSkeleton, ProListSkeleton } from "@/components/skeletons"
 import { TradeDirectory } from "@/components/trade-directory"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { load } from "@/lib/server-data"
 import { catalogService } from "@/services/catalog.service"
 import { prosService } from "@/services/pros.service"
@@ -45,17 +44,6 @@ export default function ServicesPage() {
           </Button>
         </div>
       </PageHeader>
-      <form action="/pros" role="search" className="flex gap-2">
-        <InputGroup className="h-12 flex-1 max-sm:h-10">
-          <InputGroupAddon>
-            <Search aria-hidden />
-          </InputGroupAddon>
-          <InputGroupInput name="q" type="search" aria-label="Search pros" placeholder="Search pros by name, trade or area" />
-        </InputGroup>
-        <Button type="submit" size="lg">
-          Search
-        </Button>
-      </form>
       <ul aria-label="How it works" className="scrollbar-none grid gap-4 rounded-3xl bg-muted p-5 max-sm:flex max-sm:gap-3 max-sm:overflow-x-auto max-sm:rounded-xl max-sm:p-2 sm:grid-cols-3">
         {steps.map((s) => (
           <li key={s.title}>

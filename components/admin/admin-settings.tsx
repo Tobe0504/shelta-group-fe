@@ -149,7 +149,7 @@ function SettingsForm({ initial }: { initial: MarketplaceSettings }) {
       </Section>
 
       <Section title="Buyer fees" description="Added at checkout on top of delivery.">
-        <NumberField id="offload" label="Offloading crew, per delivery" value={s.offloadFee} onChange={(v) => set({ offloadFee: amount(v) })} prefix="₦" />
+        <NumberField id="offload" label="Minimum offloading fee, per delivery" help="Sellers set their own price, but never below this." value={s.offloadFee} onChange={(v) => set({ offloadFee: amount(v) })} prefix="₦" />
         <NumberField id="service" label="Service fee, per order" value={s.serviceFee} onChange={(v) => set({ serviceFee: amount(v) })} prefix="₦" help="Use 0 for no service fee." />
       </Section>
 

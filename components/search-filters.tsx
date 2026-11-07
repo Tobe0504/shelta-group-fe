@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import type { Department } from "@/lib/types"
 import { useNavigate } from "./navigation-progress"
 
-export type Filters = { q?: string; category?: string; brands?: string[]; deals?: boolean; sort?: "best" | "price-asc" | "price-desc" }
+export type Filters = { q?: string; category?: string; department?: string; brands?: string[]; deals?: boolean; sort?: "best" | "price-asc" | "price-desc" }
 
 const sorts = [
   { value: "best", label: "Best match" },
@@ -25,6 +25,7 @@ function toUrl(f: Filters) {
   const p = new URLSearchParams()
   if (f.q) p.set("q", f.q)
   if (f.category) p.set("category", f.category)
+  else if (f.department) p.set("department", f.department)
   f.brands?.forEach((b) => p.append("brand", b))
   if (f.deals) p.set("deals", "1")
   if (f.sort && f.sort !== "best") p.set("sort", f.sort)

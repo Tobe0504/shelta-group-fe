@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useDeleteCategory, useDeleteDepartment, useSaveCategory, useSaveDepartment } from "@/hooks/use-admin"
 import { useDepartments } from "@/hooks/use-catalog"
@@ -59,6 +60,26 @@ function NameField({ id, label, defaultValue, slug }: { id: string; label: strin
   )
 }
 
+function ToneField({ id, defaultValue }: { id: string; defaultValue?: Tone }) {
+  return (
+    <Field>
+      <FieldLabel htmlFor={id}>Tile colour</FieldLabel>
+      <Select name="tone" defaultValue={defaultValue ?? "blue"}>
+        <SelectTrigger id={id}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {(Object.keys(tones) as Tone[]).map((t) => (
+            <SelectItem key={t} value={t} className="capitalize">
+              <span aria-hidden className={cn("size-3 rounded-full", tones[t].bg)} /> {t}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
+  )
+}
+
 function OrderField({ defaultValue }: { defaultValue?: number }) {
   return (
     <Field>
@@ -101,21 +122,7 @@ function CategoryDialog({ category, departments, trigger }: { category?: Categor
           </SelectContent>
         </Select>
       </Field>
-      <Field>
-        <FieldLabel htmlFor="cat-tone">Tile colour</FieldLabel>
-        <Select name="tone" defaultValue={category?.tone ?? "blue"}>
-          <SelectTrigger id="cat-tone">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(tones) as Tone[]).map((t) => (
-              <SelectItem key={t} value={t} className="capitalize">
-                <span aria-hidden className={cn("size-3 rounded-full", tones[t].bg)} /> {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Field>
+      <ToneField id="cat-tone" defaultValue={category?.tone} />
       <OrderField defaultValue={category?.order} />
     </FormDialog>
   )
@@ -177,7 +184,17 @@ function DepartmentDialog({ department, index, trigger }: { department?: Departm
       description="Product departments group categories in the menu and filters. Service departments group the trades buyers hire."
       success={department ? "Department updated" : "Department added"}
       trigger={trigger}
-      onSave={(f) => save.mutateAsync({ slug: department?.slug ?? slugify(str(f, "name")), name: str(f, "name"), kind: str(f, "kind") as DepartmentKind, order: Number(f.get("order")) || 0 })}
+      onSave={(f) =>
+        save.mutateAsync({
+          slug: department?.slug ?? slugify(str(f, "name")),
+          name: str(f, "name"),
+          kind: str(f, "kind") as DepartmentKind,
+          tone: str(f, "tone") as Tone,
+          blurb: str(f, "blurb") || undefined,
+          featured: f.get("featured") === "on",
+          order: Number(f.get("order")) || 0,
+        })
+      }
     >
       <NameField id="dept-name" label="Name" defaultValue={department?.name} />
       <Field>
@@ -191,6 +208,15 @@ function DepartmentDialog({ department, index, trigger }: { department?: Departm
             <SelectItem value="services">Services (trades people hire)</SelectItem>
           </SelectContent>
         </Select>
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="dept-blurb">Short description</FieldLabel>
+        <Input id="dept-blurb" name="blurb" maxLength={160} defaultValue={department?.blurb} placeholder="e.g. Cement, rods, blocks, roofing and more" />
+      </Field>
+      <ToneField id="dept-tone" defaultValue={department?.tone} />
+      <Field orientation="horizontal">
+        <Switch id="dept-featured" name="featured" defaultChecked={department?.featured} />
+        <FieldLabel htmlFor="dept-featured">Show on the home page</FieldLabel>
       </Field>
       <OrderField defaultValue={index} />
     </FormDialog>
@@ -216,6 +242,7 @@ function DepartmentsTab({ departments }: { departments: Department[] }) {
               <span className="font-medium">{d.name}</span>
               <span className="text-sm text-muted-foreground">{d.categories.map((c) => c.name).join(", ") || "No categories"}</span>
             </span>
+            {d.featured && <Badge variant="success">On home page</Badge>}
             <Badge variant={d.kind === "services" ? "accent" : "secondary"}>
               {d.kind === "services" ? "Services" : "Products"} · {d.categories.length}
             </Badge>

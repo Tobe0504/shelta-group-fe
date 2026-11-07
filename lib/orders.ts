@@ -1,25 +1,35 @@
-import type { PaymentMethod, Shipment, ShipmentStatus } from "./types"
+import type { Fulfilment, PaymentMethod, Shipment, ShipmentStatus } from "./types"
 
-/** The visible delivery steps, in order. */
-export const deliverySteps: { status: ShipmentStatus; label: string }[] = [
+type Step = { status: ShipmentStatus; label: string }
+
+const deliverySteps: Step[] = [
   { status: "placed", label: "Paid" },
   { status: "confirmed", label: "Confirmed" },
   { status: "loaded", label: "Loaded" },
   { status: "on_the_way", label: "On the way" },
   { status: "delivered", label: "Delivered" },
 ]
+/** A pickup skips the truck: ready at the store, then collected. */
+const pickupSteps: Step[] = [
+  { status: "placed", label: "Paid" },
+  { status: "confirmed", label: "Confirmed" },
+  { status: "loaded", label: "Ready" },
+  { status: "delivered", label: "Collected" },
+]
 
-/** Index into `deliverySteps`; -1 before payment or when cancelled. */
-export const stepIndex = (status: ShipmentStatus) => deliverySteps.findIndex((s) => s.status === status)
+/** The visible steps for a delivery or a pickup, in order. */
+export const stepsFor = (fulfilment: Fulfilment = "delivery") => (fulfilment === "pickup" ? pickupSteps : deliverySteps)
 
-export const statusLabel = (s: Pick<Shipment, "status" | "slot">) =>
+export const isPickup = (s: Pick<Shipment, "fulfilment">) => s.fulfilment === "pickup"
+
+export const statusLabel = (s: Pick<Shipment, "status" | "slot" | "fulfilment">) =>
   ({
     pending_payment: "Awaiting payment",
     placed: `Waiting for seller · ${s.slot}`,
     confirmed: `Confirmed · ${s.slot}`,
-    loaded: "Loaded at depot",
+    loaded: isPickup(s) ? "Ready for pickup" : "Loaded at depot",
     on_the_way: "On the way",
-    delivered: "Delivered",
+    delivered: isPickup(s) ? "Collected" : "Delivered",
     cancelled: "Cancelled",
   })[s.status]
 

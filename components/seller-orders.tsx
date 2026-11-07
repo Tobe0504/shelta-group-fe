@@ -11,7 +11,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useSellerOrders, useShipmentStep } from "@/hooks/use-seller"
 import { formatNaira } from "@/lib/format"
-import { isDone, statusLabel } from "@/lib/orders"
+import { isDone, isPickup, statusLabel } from "@/lib/orders"
 import type { Driver, ShipmentStatus } from "@/lib/types"
 import { DeliveryProgress } from "./delivery-progress"
 import { EmptyState } from "./empty-state"
@@ -112,7 +112,7 @@ export function SellerOrders() {
                         {shipment.offload && " · offloading crew"}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        To {order.site.address} · {shipment.slot}
+                        {isPickup(shipment) ? "Buyer collects from your store" : `To ${order.site.address}`} · {shipment.slot}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
@@ -120,7 +120,7 @@ export function SellerOrders() {
                       <Badge variant={shipment.status === "delivered" ? "success" : shipment.status === "cancelled" ? "secondary" : "deal-soft"}>{statusLabel(shipment)}</Badge>
                     </div>
                   </div>
-                  {shipment.status !== "cancelled" && <DeliveryProgress status={shipment.status} label={`Order ${order.number} progress`} />}
+                  {shipment.status !== "cancelled" && <DeliveryProgress status={shipment.status} fulfilment={shipment.fulfilment} label={`Order ${order.number} progress`} />}
                   {shipment.issue && (
                     <p className="rounded-2xl bg-deal-soft p-4 text-sm text-deal-soft-foreground">
                       <strong className="font-semibold">{shipment.issue.reason}.</strong> {shipment.issue.message}
@@ -128,8 +128,13 @@ export function SellerOrders() {
                   )}
                   <div className="flex flex-wrap gap-2.5">
                     {shipment.status === "placed" && <Button onClick={() => move({ type: "accept" }, `Order ${order.number} accepted`)}>Accept order</Button>}
-                    {shipment.status === "confirmed" && <Button onClick={() => move({ type: "load" }, "Marked as loaded")}>Mark as loaded</Button>}
-                    {shipment.status === "loaded" && (
+                    {shipment.status === "confirmed" &&
+                      (isPickup(shipment) ? (
+                        <Button onClick={() => move({ type: "load" }, "Marked ready. The buyer can come and collect.")}>Mark ready for pickup</Button>
+                      ) : (
+                        <Button onClick={() => move({ type: "load" }, "Marked as loaded")}>Mark as loaded</Button>
+                      ))}
+                    {shipment.status === "loaded" && !isPickup(shipment) && (
                       <DispatchDialog pending={step.isPending} onDispatch={(driver, done) => move({ type: "dispatch", driver }, "Out for delivery. The buyer has the driver’s details.", done)} />
                     )}
                     {(shipment.status === "placed" || shipment.status === "confirmed") && (

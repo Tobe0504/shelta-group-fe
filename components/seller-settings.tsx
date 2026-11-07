@@ -12,6 +12,7 @@ import type { OwnStore, Place } from "@/lib/types"
 import { AddressSearch } from "./address-search"
 import { PayoutForm } from "./payout-form"
 import { PickedPlace } from "./picked-place"
+import { StoreDeliveryForm } from "./store-delivery-form"
 import { EmptyState } from "./empty-state"
 import { PageHeader } from "./page-header"
 import { FormSkeleton } from "./skeletons"
@@ -104,6 +105,9 @@ export function SellerSettings() {
         <div className="grid items-start gap-6 max-sm:gap-3 lg:grid-cols-2">
           <ProfileCard store={store} />
           <PayoutCard store={store} />
+          <SettingsCard title="Delivery and pickup" description="Your delivery days and times, offloading price, and whether buyers can collect.">
+            <StoreDeliveryForm store={store} />
+          </SettingsCard>
         </div>
       )}
     </>

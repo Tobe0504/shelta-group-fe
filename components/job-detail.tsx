@@ -20,6 +20,7 @@ import { PhotoGrid } from "./photo-viewer"
 import { ProAvatar, ProName } from "./pro-card"
 import { Rating } from "./rating"
 import { ReviewDialog } from "./review-dialog"
+import { StartChat } from "./start-chat"
 import { Section } from "./section"
 import { ProductDetailSkeleton } from "./skeletons"
 
@@ -85,6 +86,13 @@ function QuoteCard({ job, bid }: { job: Job; bid: Bid }) {
               </Button>
             }
           />
+        )}
+        {bid.status !== "declined" && (
+          <StartChat to={{ pro: bid.pro.slug }} subject={job.title} about={{ label: job.title, href: `/account/jobs/${job.id}` }} title={`Message ${bid.pro.name}`} description={`About “${job.title}”`} placeholder="Ask about their quote, timing or materials">
+            <Button size="sm" variant="secondary">
+              <MessageCircle aria-hidden /> Message
+            </Button>
+          </StartChat>
         )}
         {bid.status === "declined" && <Badge variant="secondary">Not chosen</Badge>}
       </div>

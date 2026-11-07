@@ -1,6 +1,6 @@
 "use client"
 
-import { CircleCheck, Clock, MessageCircle, Phone, Printer } from "lucide-react"
+import { CircleCheck, Clock, MapPin, MessageCircle, Phone, Printer } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -19,39 +19,39 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { RadioGroup } from "@/components/ui/radio-group"
-import { useSettings } from "@/hooks/use-catalog"
-import { useOrder, useRetryPayment, useShipmentAction } from "@/hooks/use-orders"
+import { useOrder, useRetryPayment, useShipmentAction, useShipmentSlots } from "@/hooks/use-orders"
 import { formatKm } from "@/lib/delivery"
 import { formatDay, formatNaira } from "@/lib/format"
 import { isStatus } from "@/lib/http"
-import { isDone, paymentLabel, statusLabel } from "@/lib/orders"
+import { isDone, isPickup, paymentLabel, statusLabel } from "@/lib/orders"
 import type { Order, Shipment } from "@/lib/types"
 import { ChoiceCard } from "./choice-card"
 import { DeliveryProgress } from "./delivery-progress"
 import { EmptyState } from "./empty-state"
-import { EnquiryDialog } from "./enquiry-dialog"
+import { StartChat } from "./start-chat"
 import { MessageDialog } from "./message-dialog"
 import { RequireAuth } from "./require-auth"
 import { SellerCard } from "./seller-card"
-import { SplitSkeleton } from "./skeletons"
+import { ListSkeleton, SplitSkeleton } from "./skeletons"
 
 type Act = ReturnType<typeof useShipmentAction>
 
-function RescheduleDialog({ shipment, act }: { shipment: Shipment; act: Act }) {
+function RescheduleDialog({ order, shipment, act }: { order: string; shipment: Shipment; act: Act }) {
   const [open, setOpen] = useState(false)
   const [slot, setSlot] = useState(shipment.slot)
-  const slots = useSettings().data?.deliverySlots ?? []
+  const slots = useShipmentSlots(order, shipment.id, open)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">Change delivery time</Button>
+        <Button variant="secondary">{isPickup(shipment) ? "Change pickup time" : "Change delivery time"}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Pick a new delivery time</DialogTitle>
+          <DialogTitle>{isPickup(shipment) ? "Pick a new pickup time" : "Pick a new delivery time"}</DialogTitle>
         </DialogHeader>
-        <RadioGroup value={slot} onValueChange={setSlot} aria-label="Delivery time" className="gap-2">
-          {slots.map((t, i) => (
+        {slots.isPending && <ListSkeleton rows={3} className="h-12 rounded-2xl" />}
+        <RadioGroup value={slot} onValueChange={setSlot} aria-label="Delivery time" className="max-h-[50vh] gap-2 overflow-y-auto">
+          {(slots.data ?? []).map((t, i) => (
             <ChoiceCard key={t} id={`resched-${i}`} value={t}>
               {t}
             </ChoiceCard>
@@ -59,7 +59,8 @@ function RescheduleDialog({ shipment, act }: { shipment: Shipment; act: Act }) {
         </RadioGroup>
         <DialogFooter>
           <Button
-            disabled={act.isPending || slot === shipment.slot}
+            loading={act.isPending}
+            disabled={slot === shipment.slot}
             onClick={() =>
               act.mutate(
                 { id: shipment.id, action: { type: "reschedule", slot } },
@@ -102,7 +103,15 @@ function ShipmentCard({ order, shipment, index, act }: { order: Order; shipment:
           {statusLabel(shipment)}
         </Badge>
       </div>
-      {status !== "cancelled" && <DeliveryProgress status={status} label={`${label} progress`} />}
+      {status !== "cancelled" && <DeliveryProgress status={status} fulfilment={shipment.fulfilment} label={`${label} progress`} />}
+      {isPickup(shipment) && shipment.pickupAddress && (
+        <p className="flex items-start gap-1.5 rounded-2xl bg-muted p-3 text-sm max-sm:rounded-xl max-sm:p-2.5 max-sm:text-xs">
+          <MapPin aria-hidden className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+          <span>
+            You collect from <strong className="font-semibold">{shipment.pickupAddress}</strong> · {shipment.slot}
+          </span>
+        </p>
+      )}
       {shipment.issue && (
         <p className="rounded-2xl bg-deal-soft p-4 text-sm text-deal-soft-foreground">
           <strong className="font-semibold">{shipment.issue.reason}.</strong> {shipment.issue.message}
@@ -124,14 +133,14 @@ function ShipmentCard({ order, shipment, index, act }: { order: Order; shipment:
       )}
 
       <div className="flex flex-wrap gap-2.5">
-        {status === "on_the_way" && (
+        {(status === "on_the_way" || (status === "loaded" && isPickup(shipment))) && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button>Confirm delivery</Button>
+              <Button>{isPickup(shipment) ? "Confirm I’ve collected it" : "Confirm delivery"}</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirm this delivery?</AlertDialogTitle>
+                <AlertDialogTitle>{isPickup(shipment) ? "Confirm you’ve collected everything?" : "Confirm this delivery?"}</AlertDialogTitle>
                 <AlertDialogDescription>
                   {formatNaira(shipment.amount)} will be released to {shipment.storeName}. Only confirm once you have counted and checked everything.
                 </AlertDialogDescription>
@@ -145,7 +154,7 @@ function ShipmentCard({ order, shipment, index, act }: { order: Order; shipment:
             </AlertDialogContent>
           </AlertDialog>
         )}
-        {(status === "placed" || status === "confirmed") && <RescheduleDialog shipment={shipment} act={act} />}
+        {(status === "placed" || status === "confirmed") && <RescheduleDialog order={order.number} shipment={shipment} act={act} />}
         {status !== "pending_payment" && !isDone(status) && (
           <MessageDialog
             title="Report a problem"
@@ -160,11 +169,11 @@ function ShipmentCard({ order, shipment, index, act }: { order: Order; shipment:
           </MessageDialog>
         )}
         {!isDone(status) && shipment.lines[0] && (
-          <EnquiryDialog topic="product" target={shipment.lines[0].slug} title={`Message ${shipment.storeName}`} description={`Order ${order.number}`} success={`Message sent to ${shipment.storeName}`}>
+          <StartChat to={{ store: shipment.store }} about={{ label: `Order ${order.number}`, href: `/orders/${order.number}` }} title={`Message ${shipment.storeName}`} description={`About order ${order.number}`}>
             <Button variant="secondary">
               <MessageCircle aria-hidden /> Chat with seller
             </Button>
-          </EnquiryDialog>
+          </StartChat>
         )}
       </div>
     </Card>

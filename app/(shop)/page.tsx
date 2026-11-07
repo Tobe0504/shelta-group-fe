@@ -28,14 +28,15 @@ const sideOffers = [
   { title: "Quotes for your list", text: "Upload a bill of quantities", cta: "Request a quote", href: "/quote", tone: "mint", icon: FileText },
 ] as const
 
-async function Categories() {
-  const departments = await load(catalogService.departments)
-  return <CategoryTiles categories={departments.flatMap((d) => d.categories)} />
+async function Departments() {
+  const departments = await load(() => catalogService.departments("all"))
+  const featured = departments.filter((d) => d.featured).sort((a, b) => Number(a.kind === "services") - Number(b.kind === "services"))
+  return <CategoryTiles label="Shop by department" items={featured.slice(0, 8).map((d) => ({ ...d, href: `/departments/${d.slug}` }))} />
 }
 
 async function Trades() {
   const departments = await load(() => catalogService.departments("services"))
-  return <CategoryTiles categories={departments.flatMap((d) => d.categories)} trades label="Hire a pro" />
+  return <CategoryTiles label="Hire a pro" items={departments.flatMap((d) => d.categories).map((c) => ({ ...c, href: `/services/${c.slug}` }))} />
 }
 
 async function Promos() {
@@ -66,8 +67,8 @@ export default function HomePage() {
   return (
     <div className="container-page flex flex-col gap-14 py-8 max-sm:gap-5 max-sm:py-3">
       <h1 className="sr-only">SheltaMart: building materials delivered to your site</h1>
-      <Suspense fallback={<TilesSkeleton />}>
-        <Categories />
+      <Suspense fallback={<TilesSkeleton count={8} />}>
+        <Departments />
       </Suspense>
 
       <section aria-label="Offers" className="flex flex-col gap-4 max-sm:gap-2 lg:flex-row">

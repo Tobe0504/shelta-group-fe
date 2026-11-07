@@ -1,12 +1,10 @@
 "use client"
 
-import { Search } from "lucide-react"
+import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
 import { useDeliveryLocation } from "@/hooks/use-location"
 import { proSearchUrl } from "@/lib/pro-search"
 import type { Department } from "@/lib/types"
@@ -29,20 +27,12 @@ export function ProFilters({ search, trades, basePath, fixedTrade }: { search: P
 
   return (
     <div aria-busy={pending} className="flex flex-col gap-3 max-sm:gap-2">
-      <form
-        role="search"
-        onSubmit={(e) => {
-          e.preventDefault()
-          go({ q: String(new FormData(e.currentTarget).get("q") ?? "").trim() || undefined })
-        }}
-        className="flex gap-2"
-      >
-        <InputGroup className="flex-1">
-          <InputGroupAddon>{pending ? <Spinner aria-label="Searching" /> : <Search aria-hidden />}</InputGroupAddon>
-          <InputGroupInput key={search.q} name="q" type="search" defaultValue={search.q} aria-label="Search pros" placeholder="Name, trade or area, e.g. tiler Lekki" />
-        </InputGroup>
-        <Button type="submit">Search</Button>
-      </form>
+      {search.q && (
+        <Button variant="secondary" size="sm" className="w-fit" onClick={() => go({ q: undefined })}>
+          Matching “{search.q}” <X aria-hidden />
+          <span className="sr-only">Clear search</span>
+        </Button>
+      )}
       <div className="scrollbar-none flex items-center gap-2 max-sm:-mx-3 max-sm:overflow-x-auto max-sm:px-3 max-sm:pb-0.5">
         {!fixedTrade && (
           <Select value={search.trade ?? "all"} onValueChange={(v) => go({ trade: v === "all" ? undefined : v })}>

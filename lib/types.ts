@@ -7,12 +7,23 @@ export type Paged<T> = { data: T[]; meta: { page: number; limit: number; total: 
 export type Category = { id: string; slug: string; name: string; tone: Tone; department: string }
 /** `products` are sold through the cart; `services` are trades people hire through job requests. */
 export type DepartmentKind = "products" | "services"
-export type Department = { id: string; slug: string; name: string; kind?: DepartmentKind; categories: Category[] }
+export type Department = {
+  id: string
+  slug: string
+  name: string
+  kind?: DepartmentKind
+  /** Shown as a home page tile. */
+  featured?: boolean
+  tone?: Tone
+  blurb?: string
+  categories: Category[]
+}
 export type Coords = { lat: number; lng: number }
 /** A searched or pinned location. */
 export type Place = { label: string; area: string; state?: string; coords: Coords }
 export type DeliveryRates = { deliveryBaseFee: number; deliveryPerKm: number; deliveryMinFee: number; roadFactor: number; maxDeliveryKm: number }
-export type Settings = { offloadFee: number; serviceFee: number; deliverySlots: string[]; delivery: DeliveryRates }
+/** Public marketplace settings. `offloadFee` is the minimum a store may charge; windows and days ahead are store defaults. */
+export type Settings = { offloadFee: number; serviceFee: number; deliverySlots: string[]; deliveryWindows: string[]; deliveryDaysAhead: number; delivery: DeliveryRates }
 
 export type Store = {
   id: string
@@ -27,9 +38,14 @@ export type Store = {
   verified: boolean
   replyTime: string
   rating: number
+  /** Buyers may collect from the warehouse. */
+  pickup?: boolean
+  pickupHours?: string
 }
 export type Payout = { bankCode: string; bankName: string; accountNumber: string; accountName: string }
-export type OwnStore = Store & { payout?: Payout }
+/** The store's own delivery rules; anything unset falls back to the marketplace defaults. */
+export type StoreDelivery = { deliveryWindows?: string[]; deliveryDays?: number[]; deliveryDaysAhead?: number; offloadFee?: number }
+export type OwnStore = Store & StoreDelivery & { payout?: Payout }
 
 export type PriceTier = { label?: string; min: number; price: number }
 export type ProductStatus = "live" | "draft" | "out-of-stock"
@@ -62,7 +78,20 @@ export type ProductInput = Pick<Product, "name" | "brand" | "category" | "price"
 }
 
 export type CartItem = { product: Pick<Product, "id" | "slug" | "name" | "unit" | "price" | "category" | "images"> & { store: { id: string; name: string } }; qty: number; unitPrice: number; total: number; saving: number }
-export type CartShipment = { store: { id: string; name: string }; items: CartItem[]; goods: number; delivery: number; distanceKm: number | null; inRange: boolean; offload: number; amount: number }
+export type Fulfilment = "delivery" | "pickup"
+/** Per-store checkout choices: its delivery slots, offloading price, and pickup point if it offers one. */
+export type ShipmentOptions = { slots: string[]; offloadFee: number; pickup: { address: string; hours?: string } | null }
+export type CartShipment = {
+  store: { id: string; name: string }
+  items: CartItem[]
+  goods: number
+  delivery: number
+  distanceKm: number | null
+  inRange: boolean
+  offload: number
+  amount: number
+  options: ShipmentOptions
+}
 export type CartSummary = { shipments: CartShipment[]; itemCount: number; subtotal: number; delivery: number; offload: number; savings: number; total: number }
 export type Cart = { lines: { product: CartItem["product"] & { stock: number }; qty: number }[]; summary: CartSummary }
 
@@ -78,6 +107,8 @@ export type Shipment = {
   store: string
   storeName: string
   lines: { product: string; slug: string; name: string; unit: string; qty: number; unitPrice: number; total: number }[]
+  fulfilment?: Fulfilment
+  pickupAddress?: string
   slot: string
   offload: boolean
   goods: number
@@ -247,6 +278,45 @@ export type BidInput = { amount: number; timeline: string; message?: string; sta
 /** A job with money in escrow or a payout outstanding, for admins. */
 export type EscrowJob = Omit<Job, "bids" | "pro"> & { user: { id: string; name: string; email: string }; hired: { id: string; slug: string; name: string; phone: string } }
 
+// ——— Search ———
+
+/** One search across everything, for the spotlight. */
+export type SpotlightResults = {
+  departments: { slug: string; name: string; tone?: Tone }[]
+  categories: { slug: string; name: string; tone: Tone; service: boolean }[]
+  products: Pick<Product, "id" | "slug" | "name" | "price" | "unit" | "images" | "category">[]
+  pros: Pick<Pro, "id" | "slug" | "name" | "headline" | "photo" | "verified" | "rating" | "location">[]
+  estates: Pick<Estate, "id" | "slug" | "name" | "kind" | "area" | "city" | "price" | "per" | "images">[]
+}
+
+// ——— Messaging ———
+
+export type ConversationKind = "store" | "pro" | "support"
+/** A chat thread as the signed-in person sees it. */
+export type Conversation = {
+  id: string
+  kind: ConversationKind
+  subject: string
+  /** What it's about, e.g. a product or job, with a link. */
+  about?: { label?: string; href?: string }
+  status: "open" | "resolved"
+  last?: { body?: string; sender?: string; at?: string }
+  unread: boolean
+  counterpart: { name: string; avatar?: string; href?: string }
+  updatedAt: string
+}
+export type ChatMessage = { id: string; conversation: string; sender: string; fromSupport: boolean; body: string; createdAt: string }
+export type Thread = { conversation: Conversation; messages: ChatMessage[] }
+/** Who to message: a store or pro (by slug), or SheltaMart support. */
+export type ChatTarget = { store?: string; pro?: string; support?: true }
+export type StartChatInput = ChatTarget & { subject?: string; about?: { label: string; href: string }; body: string }
+
+// ——— Notifications ———
+
+export type NotificationKind = "job" | "quote" | "hired" | "payment" | "payout" | "message" | "order" | "system"
+export type AppNotification = { id: string; kind: NotificationKind; title: string; body?: string; href?: string; read: boolean; createdAt: string }
+export type NotificationList = { items: AppNotification[]; unread: number }
+
 export type Enquiry = { id: string; topic: "product" | "estate"; name: string; phone: string; reason?: string; message: string; status: "new" | "replied" | "closed"; product?: { slug: string; name: string }; createdAt: string }
 
 // ——— Admin ———
@@ -282,7 +352,10 @@ export type MarketplaceSettings = {
 export type PromoInput = Omit<Promo, "id"> & { order?: number; active?: boolean }
 export type EstateInput = Omit<Estate, "id" | "slug" | "coords"> & { coords?: Coords | null }
 export type CategoryInput = Omit<Category, "id"> & { order?: number }
-export type DepartmentInput = { slug: string; name: string; kind?: DepartmentKind; order?: number }
+export type DepartmentInput = { slug: string; name: string; kind?: DepartmentKind; featured?: boolean; tone?: Tone; blurb?: string; order?: number }
+
+/** A paid order with money in escrow or a payout outstanding, for admins. */
+export type EscrowOrder = Omit<Order, "buyer"> & { buyer: { id: string; name: string; email: string; phone?: string } }
 
 export type AdminPro = OwnPro & { owner: { id: string; name: string; email: string }; createdAt: string }
 

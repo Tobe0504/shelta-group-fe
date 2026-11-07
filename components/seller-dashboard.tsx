@@ -14,6 +14,7 @@ import { EmptyState } from "./empty-state"
 import { PageHeader } from "./page-header"
 import { ProductImage } from "./product-image"
 import { ListSkeleton } from "./skeletons"
+import { PayoutReminder } from "./payout-reminder"
 import { StatCard } from "./stat-card"
 
 const LOW_STOCK = 100
@@ -66,11 +67,13 @@ export function SellerDashboard() {
   const open = mine.filter(({ shipment }) => !isDone(shipment.status))
   const released = mine.filter(({ shipment }) => shipment.payoutStatus === "paid").reduce((n, { shipment }) => n + shipment.payout, 0)
   const held = open.reduce((n, { shipment }) => n + shipment.payout, 0)
+  const waiting = mine.filter(({ shipment }) => shipment.payoutStatus === "pending" || shipment.payoutStatus === "failed").reduce((n, { shipment }) => n + shipment.payout, 0)
   const low = listings.filter((l) => l.stock < LOW_STOCK || l.status === "out-of-stock")
 
   return (
     <>
       {header}
+      {store && !store.payout && <PayoutReminder amount={waiting} href="/seller/settings" />}
       {store && !store.coords && (
         <p role="status" className="flex flex-wrap items-center gap-3 rounded-3xl bg-deal-soft p-5 text-deal-soft-foreground max-sm:gap-2 max-sm:rounded-2xl max-sm:p-3 max-sm:text-sm">
           <MapPin aria-hidden className="size-5 shrink-0" />

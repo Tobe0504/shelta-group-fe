@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ClipboardList, HardHat, Heart, LayoutDashboard, LogOut, Package, Store, UserRound } from "lucide-react"
+import { ClipboardList, HardHat, Headset, Heart, LayoutDashboard, LogOut, MessageCircle, Package, Store, UserRound } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -74,6 +74,16 @@ export function UserMenu() {
           <DropdownMenuItem asChild className={itemClass}>
             <Link href="/saved">
               <Heart aria-hidden /> Saved items
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className={itemClass}>
+            <Link href="/messages">
+              <MessageCircle aria-hidden /> Messages
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className={itemClass}>
+            <Link href="/help">
+              <Headset aria-hidden /> Help &amp; support
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

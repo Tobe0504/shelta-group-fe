@@ -1,9 +1,11 @@
 "use client"
 
+import { Suspense } from "react"
 import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 import { NavigationProgress } from "./navigation-progress"
+import { RealtimeBridge } from "./realtime-bridge"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { errorMessage } from "@/lib/http"
 
@@ -41,7 +43,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={getClient()}>
       <TooltipProvider>
-        <NavigationProgress>{children}</NavigationProgress>
+        <NavigationProgress>
+          <Suspense>
+            <RealtimeBridge />
+          </Suspense>
+          {children}
+        </NavigationProgress>
       </TooltipProvider>
       <Toaster position="bottom-center" />
     </QueryClientProvider>

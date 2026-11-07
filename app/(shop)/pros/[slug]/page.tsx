@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Briefcase, MapPin, Star } from "lucide-react";
+import { Briefcase, MapPin, MessageCircle, Star } from "lucide-react";
+import { StartChat } from "@/components/start-chat";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/page-breadcrumb";
@@ -84,13 +85,16 @@ async function ProDetail({
               {formatRate(pro.rate)}
             </p>
           )}
-          <Button asChild>
-            <Link
-              href={`/services/request?pro=${pro.slug}&trade=${pro.trades[0] ?? ""}`}
-            >
-              Request a quote
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <StartChat to={{ pro: pro.slug }} about={{ label: pro.name, href: `/pros/${pro.slug}` }} title={`Message ${pro.name}`} description="Ask about availability, prices or past work before you post a job." placeholder="Hi, are you available next week for…">
+              <Button variant="secondary">
+                <MessageCircle aria-hidden /> Message
+              </Button>
+            </StartChat>
+            <Button asChild>
+              <Link href={`/services/request?pro=${pro.slug}&trade=${pro.trades[0] ?? ""}`}>Request a quote</Link>
+            </Button>
+          </div>
         </div>
       </header>
 

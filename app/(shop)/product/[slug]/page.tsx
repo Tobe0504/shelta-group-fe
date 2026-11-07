@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { BuyBox } from "@/components/buy-box"
 import { DeliveryEstimate } from "@/components/delivery-estimate"
 import { InfoTile } from "@/components/info-tile"
-import { EnquiryDialog } from "@/components/enquiry-dialog"
+import { StartChat } from "@/components/start-chat"
 import { PageBreadcrumb } from "@/components/page-breadcrumb"
 import { Price } from "@/components/price"
 import { ProductGrid } from "@/components/product-card"
@@ -77,18 +77,17 @@ async function ProductDetail({ params }: Pick<PageProps<"/product/[slug]">, "par
           </div>
           {product.description && <p className="text-muted-foreground max-sm:text-sm">{product.description}</p>}
           <SellerCard seller={seller} className="rounded-3xl bg-muted p-4 max-sm:rounded-xl max-sm:p-2.5">
-              <EnquiryDialog
-                topic="product"
-                target={product.slug}
+              <StartChat
+                to={{ store: seller.slug }}
+                about={{ label: product.name, href: `/product/${product.slug}` }}
                 title={`Message ${seller.name}`}
-                description={`About: ${product.name}`}
+                description={`About ${product.name}. They usually reply in ${seller.replyTime}.`}
                 placeholder="Ask about stock, delivery or bulk prices"
-                success={`Message sent. ${seller.name} usually replies in ${seller.replyTime}.`}
               >
                 <Button variant="outline" size="sm" className="border-0">
                   <MessageCircle aria-hidden /> Chat
                 </Button>
-              </EnquiryDialog>
+              </StartChat>
           </SellerCard>
         </div>
       </div>

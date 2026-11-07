@@ -13,7 +13,10 @@ import { CartLink } from "./cart-link"
 import { CategoryIcon } from "./category-icon"
 import { LocationPicker } from "./location-picker"
 import { Logo } from "./logo"
-import { SearchBox, SearchBoxFallback } from "./search-box"
+import { SearchBoxFallback } from "./search-box"
+import { Spotlight } from "./spotlight"
+import { MessagesLink } from "./messages-link"
+import { NotificationBell } from "./notification-bell"
 import { UserMenu } from "./user-menu"
 import { catalogService } from "@/services/catalog.service"
 
@@ -43,13 +46,15 @@ export function SiteHeader() {
           </Suspense>
           <div className="order-last w-full md:order-none md:w-auto md:flex-1">
             <Suspense fallback={<SearchBoxFallback />}>
-              <SearchBox />
+              <Spotlight />
             </Suspense>
           </div>
           <div className="hidden lg:block">
             <LocationPicker />
           </div>
           <nav aria-label="Account" className="ml-auto flex gap-2 max-sm:gap-1.5 md:ml-0">
+            <MessagesLink />
+            <NotificationBell />
             <UserMenu />
             <Button asChild variant="secondary" size="icon" className="max-sm:hidden">
               <Link href="/saved" aria-label="Saved items">
@@ -117,6 +122,15 @@ function MenuLinks({ items }: { items: { slug: string; name: string; tone: Tone;
   )
 }
 
+/** What the footer used to hold: selling, help and company links. */
+const quickLinks = [
+  { label: "Sell on SheltaMart", href: "/sell" },
+  { label: "Offer your services", href: "/pro/profile" },
+  { label: "Buyer protection", href: "/help#protection" },
+  { label: "Help & support", href: "/help" },
+  { label: "Contact us", href: "/help#contact" },
+]
+
 function CategoriesSheet({ departments }: { departments: Department[] }) {
   return (
     <Sheet>
@@ -147,6 +161,23 @@ function CategoriesSheet({ departments }: { departments: Department[] }) {
               { slug: "quote", name: "Request a quote", tone: "mint", href: "/quote" },
             ]}
           />
+          <section aria-labelledby="quick-links" className="flex flex-col gap-1 border-t pt-4">
+            <h3 id="quick-links" className="px-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Quick links
+            </h3>
+            <ul className="flex flex-col">
+              {quickLinks.map((l) => (
+                <li key={l.href}>
+                  <SheetClose asChild>
+                    <Link href={l.href} className="flex min-h-10 items-center rounded-xl px-2 text-sm hover:bg-secondary max-sm:min-h-9">
+                      {l.label}
+                    </Link>
+                  </SheetClose>
+                </li>
+              ))}
+            </ul>
+            <p className="px-2 pt-2 text-xs text-muted-foreground">© 2026 SheltaMart.com</p>
+          </section>
         </nav>
       </SheetContent>
     </Sheet>

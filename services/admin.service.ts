@@ -1,5 +1,5 @@
 import { data, http } from "@/lib/http"
-import type { CategoryInput, DepartmentInput, Estate, EstateInput, AdminEnquiry, AdminOverview, AdminPromo, AdminStore, Enquiry, MarketplaceSettings, Paged, PromoInput, Quote, QuoteStatus } from "@/lib/types"
+import type { EscrowOrder, CategoryInput, DepartmentInput, Estate, EstateInput, AdminEnquiry, AdminOverview, AdminPromo, AdminStore, Enquiry, MarketplaceSettings, Paged, PromoInput, Quote, QuoteStatus } from "@/lib/types"
 
 const all = { limit: 100 }
 
@@ -21,6 +21,9 @@ export const adminService = {
   updatePromo: (id: string, body: Partial<PromoInput>) => http.patch(`/admin/promos/${id}`, body).then(data<AdminPromo>),
   deletePromo: (id: string) => http.delete(`/admin/promos/${id}`),
 
+  escrowOrders: () => http.get("/admin/escrow/orders").then(data<EscrowOrder[]>),
+  releaseShipment: (number: string, id: string) => http.post(`/admin/orders/${number}/shipments/${id}/release`),
+  refundShipment: (number: string, id: string) => http.post(`/admin/orders/${number}/shipments/${id}/refund`),
   quote: (id: string) => http.get(`/admin/quotes/${id}`).then(data<Quote>),
   estates: () => http.get("/admin/estates").then(data<Estate[]>),
   createEstate: (body: EstateInput) => http.post("/admin/estates", body).then(data<Estate>),

@@ -12,6 +12,10 @@ export const useAdminStores = () => useQuery({ queryKey: keys.admin.stores, quer
 export const useAdminPromos = () => useQuery({ queryKey: keys.admin.promos, queryFn: adminService.promos })
 export const useMarketplaceSettings = () => useQuery({ queryKey: keys.admin.settings, queryFn: adminService.settings })
 
+export const useEscrowOrders = () => useQuery({ queryKey: keys.admin.escrowOrders, queryFn: adminService.escrowOrders })
+export const useReleaseShipment = () => useAdminMutation((v: { number: string; id: string }) => adminService.releaseShipment(v.number, v.id), [keys.admin.escrow], "Releasing payment…")
+export const useRefundShipment = () => useAdminMutation((v: { number: string; id: string }) => adminService.refundShipment(v.number, v.id), [keys.admin.escrow], "Starting refund…")
+
 export const useAdminEstates = () => useQuery({ queryKey: keys.admin.estates, queryFn: adminService.estates })
 
 /** A mutation that refreshes the given lists (and the overview counts) once it succeeds. `pending` shows a loading toast. */

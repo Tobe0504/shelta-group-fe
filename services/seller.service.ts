@@ -5,7 +5,7 @@ const shipment = (number: string, id: string) => `/seller/orders/${number}/shipm
 
 export const sellerService = {
   store: () => http.get("/seller/store").then(data<OwnStore>),
-  updateStore: (body: Partial<Pick<OwnStore, "name" | "about" | "address" | "location" | "coords">>) => http.patch("/seller/store", body).then(data<OwnStore>),
+  updateStore: (body: Partial<Pick<OwnStore, "name" | "about" | "address" | "location" | "coords" | "deliveryWindows" | "deliveryDays" | "deliveryDaysAhead" | "offloadFee" | "pickup" | "pickupHours">>) => http.patch("/seller/store", body).then(data<OwnStore>),
   setPayout: (body: { bankCode: string; bankName: string; accountNumber: string }) => http.put("/seller/store/payout", body).then(data<OwnStore>),
   banks: () => http.get("/seller/banks").then(data<{ name: string; code: string }[]>),
 
